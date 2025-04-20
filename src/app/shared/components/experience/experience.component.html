@@ -1,0 +1,18 @@
+@for (item of experienceItems; track item.id) {
+  <div class="card mb-3">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <img [src]="item.experience.image" class="img-fluid rounded-start" alt="{{ item.experience.companyName }}">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{ item.title }} - {{ item.experience.companyName }}</h5>
+          <p class="card-text">{{ item.description }}</p>
+          <p class="card-text">
+            <small class="text-muted">{{ item.experience.role }} | {{ item.experience.duration }}</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

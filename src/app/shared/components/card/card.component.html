@@ -1,0 +1,11 @@
+@for (card of cards; track card.title) {
+  <nx-card clickable class="nx-margin-2xs">
+    <h3 nxHeadline size="l">
+      <a nxCardMainLink [routerLink]="card.route">{{ card.title }}</a>
+    </h3>
+    <p>{{ card.description }}</p>
+    <nx-link size="small">
+      <a nxCardSecondaryInfo [routerLink]="card.route">Go to {{ card.title }}</a>
+    </nx-link>
+  </nx-card>
+}
