@@ -1,11 +1,24 @@
-@for (card of cards; track card.title) {
-  <nx-card clickable class="nx-margin-2xs">
-    <h3 nxHeadline size="l">
-      <a nxCardMainLink [routerLink]="card.route">{{ card.title }}</a>
-    </h3>
-    <p>{{ card.description }}</p>
-    <nx-link size="small">
-      <a nxCardSecondaryInfo [routerLink]="card.route">Go to {{ card.title }}</a>
-    </nx-link>
-  </nx-card>
-}
+<div nxLayout="grid">
+  <div nxCol="12">
+    @for (card of cards; track card.title) {
+      <nx-card
+        clickable
+        class="nx-margin-2xs"
+        (click)="onCardClick(card)"
+      >
+        <h3 nxHeadline size="l">
+          <a nxCardMainLink [routerLink]="card.route">{{ card.title }}</a>
+        </h3>
+        <p>{{ card.description }}</p>
+        <nx-link size="small">
+          <a nxCardSecondaryInfo [routerLink]="card.route">Purchase {{ card.title }}</a>
+        </nx-link>
+      </nx-card>
+    }
+  </div>
+  <div nxCol="12">
+    @if (selectedCard) {
+      <app-form></app-form>
+    }
+  </div>
+</div>

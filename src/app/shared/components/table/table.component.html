@@ -2,31 +2,39 @@
   <table nxTable class="nx-table--scrollable">
     <thead>
     <tr nxTableRow>
-      <th nxHeaderCell>Product</th>
-      <th nxHeaderCell>Contract Number</th>
-      <th nxHeaderCell>Description</th>
-      <th nxHeaderCell>Website</th>
-      <th nxHeaderCell>Ending At</th>
-      <th nxHeaderCell>Status</th>
+      @for (header of headers; track header) {
+        <th nxHeaderCell>{{header}}</th>
+      }
     </tr>
     </thead>
     <tbody>
       @for (item of tableElements; track item) {
-        <tr nxTableRow>
-          <td nxTableCell>{{item.product}}</td>
-          <td nxTableCell>{{item.contractNumber}}</td>
-          <td nxTableCell>{{item.desc}}</td>
+        <tr nxTableRow (click)="selectRow(item)">
+          <td nxTableCell>{{item.policyNumber}}</td>
+          <td nxTableCell>{{item.insuredName}}</td>
+          <td nxTableCell>{{item.coverageAmt}}</td>
+          <td nxTableCell>{{item.premium}}</td>
           <td nxTableCell>
-            <nx-link><a routerLink="#">{{item.website}}</a></nx-link>
-          </td>
-          <td nxTableCell>{{item.endingAt}}</td>
-          <td nxTableCell>
-            <nx-badge [type]="item.status"
-            >{{item.statusText}}</nx-badge
-            >
-          </td>
+            <span [style.color]="getStatusColor(getPolicyStatus(item.status))">
+              {{ item.status }}
+            </span>
         </tr>
       }
     </tbody>
   </table>
+
+  @if (selectedRow) {
+    <div class="policy-details">
+      <h3>Insurance Details</h3>
+      <p><strong>Policy Number:</strong> {{ selectedRow.policyNumber }}</p>
+      <p><strong>Insured Name:</strong> {{ selectedRow.insuredName }}</p>
+      <p><strong>Coverage Amount:</strong> {{ selectedRow.coverageAmt }}</p>
+      <p><strong>Premium:</strong> {{ selectedRow.premium }}</p>
+      <p><strong>Status:</strong>
+        <span [style.color]="getStatusColor(getPolicyStatus(selectedRow.status))">
+          {{ selectedRow.status }}
+        </span>
+      </p>
+    </div>
+  }
 </div>

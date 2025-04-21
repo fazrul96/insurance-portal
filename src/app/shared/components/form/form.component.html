@@ -1,22 +1,35 @@
-<div nxLayout="grid">
+<nx-card
+  class="nx-margin-2xs"
+>
+  @if (successMessage) {
+    <nx-message context="success">
+      <span class="nx-font-weight-bold">Notification title:</span><br />
+      {{ successMessage }}
+    </nx-message>
+  }
+
   <div nxRow>
-    <div nxCol="6">
+    <div nxCol="12">
       <nx-formfield
+        label="Insurance Type"
         appearance="outline"
-        label="Prefilled field"
         floatLabel="always"
       >
-        <input nxInput value="prefilled" />
+        <nx-dropdown [(ngModel)]="selectedInsurance">
+          @for (insurance of insuranceTypes; track insurance) {
+            <nx-dropdown-item [value]="insurance.title">{{ insurance.title }}</nx-dropdown-item>
+          }
+        </nx-dropdown>
       </nx-formfield>
     </div>
-    <div nxCol="6">
-      <nx-formfield
-        label="Readonly field"
-        appearance="outline"
-        floatLabel="always"
-      >
-        <span nxFormfieldPrefix>$</span>
-        <input nxInput readonly value="500" />
+    <div nxCol="12">
+      <nx-formfield label="Coverage Amount" appearance="outline" floatLabel="always">
+        <span nxFormfieldPrefix>RM</span>
+        <input
+          nxInput
+          type="number"
+          [(ngModel)]="coverageAmt"
+        />
         <button
           nxFormfieldAppendix
           nxIconButton="tertiary small"
@@ -26,102 +39,20 @@
           type="button"
           aria-label="More information"
         >
-          <nx-icon name="info-circle-o" size="s" aria-hidden="true">
-          </nx-icon>
+          <nx-icon name="info-circle-o" size="s" aria-hidden="true"></nx-icon>
         </button>
       </nx-formfield>
     </div>
   </div>
-
-  <div nxRow>
-    <div nxCol="6">
-      <nx-formfield
-        label="Dropdown Label"
-        appearance="outline"
-        floatLabel="always"
-      >
-        <nx-dropdown>
-          <nx-dropdown-item value="BMW"></nx-dropdown-item>
-          <nx-dropdown-item value="Audi"></nx-dropdown-item>
-          <nx-dropdown-item value="Volvo"></nx-dropdown-item>
-          <nx-dropdown-item value="Mini"></nx-dropdown-item>
-        </nx-dropdown>
-      </nx-formfield>
-    </div>
-    <div nxCol="6">
-      <nx-formfield
-        label="Label"
-        appearance="outline"
-        floatLabel="always"
-      >
-        <input nxInput disabled value="Disabled input" />
-      </nx-formfield>
-    </div>
-  </div>
-
-  <div nxRow>
-    <div nxCol="6">
-      <nx-formfield
-        label="Birthday"
-        appearance="outline"
-        floatLabel="always"
-      >
-<!--        <input-->
-<!--          nxDatefield-->
-<!--          nxInput-->
-<!--          [datepicker]="myDatepicker"-->
-<!--          [(ngModel)]="currentDate"-->
-<!--          nxAriaLabel="Enter the date of your Birthday"-->
-<!--        />-->
-        <nx-datepicker-toggle
-          [for]="myDatepicker"
-          nxFormfieldSuffix
-        ></nx-datepicker-toggle>
-        <nx-datepicker #myDatepicker></nx-datepicker>
-        <span nxFormfieldHint> mm/dd/yyyy </span>
-        <nx-error nxFormfieldError>
-          <strong>Error: </strong>Please type in a valid Date in the
-                                  Format mm/dd/yyyy or use the calendar to select a Date.
-        </nx-error>
-      </nx-formfield>
-    </div>
-
-    <div nxCol="6">
-      <nx-formfield
-        appearance="outline"
-        floatLabel="always"
-        label="Textarea Label"
-        optionalLabel="Optional"
-      >
-        <textarea nxInput type="text"></textarea>
-      </nx-formfield>
-    </div>
-  </div>
-
-  <div nxRow>
-    <div nxCol="6">
-      <nx-formfield
-        label="Character count"
-        appearance="outline"
-        floatLabel="always"
-      >
-        <input
-          nxInput
-          #inputToCount
-          maxlength="15"
-          (input)="onInput()"
-        />
-        <span nxFormfieldHint>
-                    @if (count === 0) {
-                      <span> max. 15 characters </span>
-                    } @if (count > 0) {
-          <span> {{15 - count }} characters remaining </span>
-        }
-                </span>
-      </nx-formfield>
-    </div>
-  </div>
-</div>
+  <button
+    nxButton="primary small"
+    type="button"
+    [disabled]="!selectedInsurance || !coverageAmt"
+    (click)="submitForm()"
+  >
+    Submit
+  </button>
+</nx-card>
 
 <nx-popover #popoverAppearanceExample>
   <div style="max-width: 300px">

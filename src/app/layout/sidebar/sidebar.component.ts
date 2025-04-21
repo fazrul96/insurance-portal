@@ -5,7 +5,7 @@ import {NxIconButtonComponent} from '@aposin/ng-aquila/button';
 import {NxIconComponent} from '@aposin/ng-aquila/icon';
 import {NxSidebarComponent, NxSidebarFooterComponent, NxSidebarToggleComponent,} from '@aposin/ng-aquila/sidebar';
 import {NxTooltipDirective} from '@aposin/ng-aquila/tooltip';
-
+import {ROUTE_PATHS} from '../../app.routes';
 
 @Component({
   selector: 'app-sidebar',
@@ -25,18 +25,17 @@ import {NxTooltipDirective} from '@aposin/ng-aquila/tooltip';
   styleUrl: './sidebar.component.scss'
 })
 
-
 export class SidebarComponent {
   actions = [
     {
       icon: 'file-text',
       label: 'Dashboard',
-      route: '/'
+      route: [ROUTE_PATHS.root]
     },
     {
       icon: 'calendar',
       label: 'Policy Purchase',
-      route: '/policy-purchase'
+      route: [ROUTE_PATHS.policyPurchase],
       // children: [
       //   {
       //     icon: 'file-text',
@@ -53,16 +52,17 @@ export class SidebarComponent {
       //     label: 'Claim Management',
       //     route: '/policy/claim-management'
       //   }
+      // ]
     },
     {
       icon: 'calendar',
       label: 'Policy Servicing',
-      route: '/policy-servicing'
+      route: [ROUTE_PATHS.policyServicing]
     },
     {
       icon: 'calendar',
       label: 'Claim Management',
-      route: '/claim-management'
+      route: [ROUTE_PATHS.claimManagement]
     }
   ];
 }
