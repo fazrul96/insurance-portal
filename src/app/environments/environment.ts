@@ -6,7 +6,7 @@ export const environment = {
   // apiUrl: config.apiUrl,
   auth0: {
     domain: 'dev-kcm0rrkdks1wi726.us.auth0.com',
-    clientId: 'SWi3PPArj7qVBRSCsudK2wFXp9LFGQmS',
+    clientId: '2XOJOYiFYCuz5hh0DCCzpt8omqbEloge', // todo recheck why other cred not work
     authorizationParams: {
       audience: 'https://dev-kcm0rrkdks1wi726.us.auth0.com/api/v2/',
     }
