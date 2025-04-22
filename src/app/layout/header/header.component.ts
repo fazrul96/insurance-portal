@@ -13,6 +13,7 @@ import {NxMenuButtonComponent, NxMenuComponent, NxMenuItemDirective,} from '@apo
 import {NxBreakpoints, NxViewportService} from '@aposin/ng-aquila/utils';
 import {merge, Subject} from 'rxjs';
 import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
+import {DASHBOARD_CARDS} from '../../shared/data/dashboard-cards.data';
 
 type ViewType = 'mobile' | 'tablet' | 'desktop';
 
@@ -35,12 +36,14 @@ interface MenuItem {
     NxMenuButtonComponent,
     NxMenuComponent,
     NxMenuItemDirective,
+
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild(NxMenuComponent) menu!: NxMenuComponent;
+  dashboardCards = DASHBOARD_CARDS;
 
   protected readonly _destroyed = new Subject<void>();
 

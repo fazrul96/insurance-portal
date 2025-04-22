@@ -4,7 +4,7 @@
       <a href="#">
         <figure nxFigure>
           <img
-            src="assets/logos/aposin_logo.svg"
+            src="assets/logos/aposin_logo.ico"
             alt="Brand Logo"
             role="none"
           />
@@ -12,7 +12,10 @@
       </a>
     </nx-link>
 
-    <nx-header-app-title>Insurance Portal</nx-header-app-title>
+    <nx-header-app-title routerLink="/">Insurance Portal</nx-header-app-title>
+    @for (header of dashboardCards; track header.title) {
+      <nx-header-app-title [routerLink]="header.route">{{ header.title }}</nx-header-app-title>
+    }
   </nx-header-brand>
 
   @if (viewType === 'tablet' || viewType === 'desktop') {
