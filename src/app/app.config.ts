@@ -7,6 +7,7 @@ import {provideHttpClient} from '@angular/common/http';
 
 import {routes} from './app.routes';
 import {provideAuth0} from '@auth0/auth0-angular';
+import {environment} from './environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,14 +15,14 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimations(),
     provideHttpClient(),
-    importProvidersFrom(NxExpertModule),
     provideAuth0({
-      domain: 'dev-kcm0rrkdks1wi726.us.auth0.com',
-      clientId: '2XOJOYiFYCuz5hh0DCCzpt8omqbEloge',
+      domain: environment.auth0.domain,
+      clientId: environment.auth0.clientId,
       authorizationParams: {
         redirect_uri: window.location.origin,
-        audience: 'https://dev-kcm0rrkdks1wi726.us.auth0.com/api/v2/',
+        audience: environment.auth0.authorizationParams.audience,
       }
     }),
+    importProvidersFrom(NxExpertModule),
   ]
 };
