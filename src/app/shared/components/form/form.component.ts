@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, inject, ViewChild} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {NxButtonComponent, NxIconButtonComponent} from '@aposin/ng-aquila/button';
 import {NxNativeDateModule,} from '@aposin/ng-aquila/datefield';
@@ -57,13 +57,10 @@ export class FormComponent {
   insuranceTypes: CardItem[] = DASHBOARD_CARDS_PRODUCTS
   selectedInsurance = '';
   coverageAmt: number = 0;
-
   successMessage: string = '';
 
-  constructor(
-    private insuranceService: InsuranceService,
-    private router: Router
-  ) {}
+  insuranceService = inject(InsuranceService);
+  router = inject(Router);
 
   submitForm() {
     if (!this.selectedInsurance || !this.coverageAmt) {

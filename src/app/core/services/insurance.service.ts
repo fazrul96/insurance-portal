@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {CardItem, DASHBOARD_CARDS_PRODUCTS} from '../../shared/data/dashboard-cards.data';
-import {PolicyStatus} from '../../shared/utils/enum-policy-status';
+import {of} from 'rxjs';
+import {createPolicy, getRandomCoverageAmount} from '../../shared/utils/policy.utils';
 
 export interface Policy {
   insuredName: string;
@@ -10,17 +11,21 @@ export interface Policy {
   status: string;
 }
 
+export interface PolicyPurchaseSummary {
+  totalPolicies: number;
+  topPolicies: { name: string; count: number }[];
+  recentPurchases: { id: string; customer: string; policy: string; date: string }[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class InsuranceService {
-  private policies: Policy[] = [];
-  private insuranceTypes: CardItem[] = DASHBOARD_CARDS_PRODUCTS
+  policies: Policy[] = [];
+  insuranceTypes: CardItem[] = DASHBOARD_CARDS_PRODUCTS
 
   constructor() {
-    this.policies.push(this.createPolicy((this.insuranceTypes)[0].title, 150000));
-    this.policies.push(this.createPolicy((this.insuranceTypes)[1].title, 600000));
-    this.policies.push(this.createPolicy((this.insuranceTypes)[2].title, 100000));
+    this.mockPolicies();
   }
 
   getPolicies(): Policy[] {
@@ -28,32 +33,28 @@ export class InsuranceService {
   }
 
   addPolicy(policy: { insuredName: string; coverageAmt: number }) {
-    const newPolicy = this.createPolicy(policy.insuredName, policy.coverageAmt);
+    const newPolicy = createPolicy(policy.insuredName, policy.coverageAmt);
     this.policies.push(newPolicy);
   }
 
-  private createPolicy(insuredName: string, coverageAmt: number): Policy {
-    const policyNumber = this.generatePolicyNumber();
-    const premium = this.calculatePremium(coverageAmt);
-    const status = coverageAmt < 500000
-      ? PolicyStatus.Active
-      : PolicyStatus.PendingApproval;
-
-    return {
-      policyNumber,
-      insuredName,
-      coverageAmt,
-      premium,
-      status,
-    };
+  getPolicyPurchaseSummary() {
+    return of({
+      totalPolicies: 1200,
+      topPolicies: [
+        { name: 'Health Insurance', count: 520 },
+        { name: 'Auto Insurance', count: 430 },
+        { name: 'Home Insurance', count: 250 }
+      ],
+      recentPurchases: [
+        { id: 'P-1001', customer: 'John Doe', policy: 'Health', date: '2025-04-20' },
+        { id: 'P-1002', customer: 'Jane Smith', policy: 'Auto', date: '2025-04-19' }
+      ]
+    });
   }
 
-  private calculatePremium(coverageAmt: number): number {
-    return coverageAmt * 0.10;
-  }
-
-  private generatePolicyNumber(): string {
-    const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
-    return `PN-${randomNumber}`;
+  private mockPolicies() {
+    this.policies = this.insuranceTypes.slice(0, 3).map(type =>
+      createPolicy(type.title, getRandomCoverageAmount())
+    );
   }
 }

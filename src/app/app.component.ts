@@ -1,4 +1,4 @@
-import {Component, TemplateRef, ViewChild} from '@angular/core';
+import {Component, inject, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {NxButtonModule} from '@aposin/ng-aquila/button';
@@ -21,10 +21,15 @@ import {HeaderComponent} from './layout/header/header.component';
 import {FooterComponent} from './layout/footer/footer.component';
 import {SidebarComponent} from './layout/sidebar/sidebar.component';
 import {ExperienceComponent} from './shared/components/experience/experience.component';
+import {InsuranceService} from './core/services/insurance.service';
+import {NxCardComponent, NxCardHeaderComponent} from '@aposin/ng-aquila/card';
+import {CommonModule} from '@angular/common';
+import {DASHBOARD_CARDS_PRODUCTS} from './shared/data/dashboard-cards.data';
 
 @Component({
     selector: 'app-root',
   imports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
@@ -48,11 +53,20 @@ import {ExperienceComponent} from './shared/components/experience/experience.com
     FooterComponent,
     SidebarComponent,
     ExperienceComponent,
+    NxCardComponent,
+    NxCardHeaderComponent,
   ],
     templateUrl: './app.component.html',
 })
 
-export class AppComponent {
+export class AppComponent implements OnInit {
+    // todo remove this line until dataService line
+    purchaseCards = DASHBOARD_CARDS_PRODUCTS;
+    summary: any;
+    displayedColumns = ['id', 'customer', 'policy', 'date'];
+
+    dataService = inject(InsuranceService);
+
     @ViewChild('consentTemplate') consentTemplateRef!: TemplateRef<any>;
     @ViewChild('submitTemplate') submitTemplateRef!: TemplateRef<any>;
     dialogRef!: NxModalRef<any>;
@@ -84,6 +98,12 @@ export class AppComponent {
     closeDialog() {
         this.dialogRef.close();
     }
+  // todo remove this line
+  ngOnInit(): void {
+    this.dataService.getPolicyPurchaseSummary().subscribe(data => {
+      this.summary = data;
+    });
+  }
 
 }
 
