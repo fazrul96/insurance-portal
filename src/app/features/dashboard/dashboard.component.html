@@ -1,2 +1,61 @@
-<app-auth></app-auth>
-<app-card [cards]="dashboardCards"></app-card>
+@if (isAuthenticated) {
+  <app-card [cards]="dashboardCards"></app-card>
+} @else {
+  <div class="big-card-image">
+<!--    <img src="assets/logos/aposin_logo.ico" alt="Please log in to see your dashboard" />-->
+    <p class="login-message">Please log in to access your dashboard.</p>
+  </div>
+}
+
+<!-- todo later remove this to its component, remove common module as well-->
+<!--<div class="policy-purchase-dashboard">-->
+<!--  <div *ngIf="summary">-->
+<!--    <h3>Policy Purchase Summary</h3>-->
+
+<!--    <nx-card *ngFor="let card of purchaseCards">-->
+<!--      <nx-card-header>{{ card.title }}</nx-card-header>-->
+<!--      <div class="card-content">-->
+<!--        <ul>-->
+<!--          <li><strong>Total Policies:</strong> {{ summary.totalPolicies }}</li>-->
+<!--          <li><strong>Top Policies:</strong></li>-->
+<!--          <ul>-->
+<!--            <li *ngFor="let policy of summary.topPolicies">-->
+<!--              {{ policy.name }}: {{ policy.count }}-->
+<!--            </li>-->
+<!--          </ul>-->
+<!--          <li><strong>Recent Purchases:</strong></li>-->
+<!--          <ul>-->
+<!--            <li *ngFor="let purchase of summary.recentPurchases">-->
+<!--              <strong>{{ purchase.id }}</strong> - {{ purchase.customer }} ({{ purchase.policy }} on {{ purchase.date }})-->
+<!--            </li>-->
+<!--          </ul>-->
+<!--        </ul>-->
+<!--      </div>-->
+<!--    </nx-card>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--@if (insuranceTypes$ | async as cards) {-->
+<!--  <nx-message context="success">-->
+<!--    <span class="nx-font-weight-bold">Notification title:</span><br />-->
+<!--    {{ successMessage }}-->
+<!--  </nx-message>-->
+<!--}-->
+
+<!--<div *ngIf="insuranceTypes$ | async as cards; else loading">-->
+<!--  <div *ngFor="let card of cards">-->
+<!--    <h3>{{ card.title }}</h3>-->
+<!--    <p>{{ card.description }}</p>-->
+<!--  </div>-->
+<!--</div>-->
+<!--<ng-template #loading>-->
+<!--  <p>Loading insurance types...</p>-->
+<!--</ng-template>-->
+
+
+
+@if (insuranceTypes$ | async) {
+  @for (header of dashboardCards; track header.title) {
+<!--    <nx-header-app-title [routerLink]="header.route">{{ header.title }}</nx-header-app-title>-->
+  }
+}

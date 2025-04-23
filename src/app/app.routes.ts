@@ -27,10 +27,6 @@ export const routes: Routes = [
   // },
   // {
   //   path: 'login',
-  //   component: LoginComponent,
-  // },
-  // {
-  //   path: 'login',
   //   loadChildren: () => import('./pages/login/login.module').then(m => m.LoginModule),
   // },
   // {

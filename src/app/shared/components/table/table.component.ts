@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, inject, Input, OnInit} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {NxBadgeComponent} from '@aposin/ng-aquila/badge';
 import {NxLinkComponent} from '@aposin/ng-aquila/link';
@@ -10,7 +10,10 @@ import {
 } from '@aposin/ng-aquila/table';
 import {InsuranceService} from '../../../core/services/insurance.service';
 import {Policy} from '../../../core/models/policy.model';
-import {PolicyStatus} from '../../utils/enum-policy-status';
+import {getPolicyStatus, getPolicyStatusColor} from '../../utils/policy.utils';
+import {NxColComponent, NxLayoutComponent} from '@aposin/ng-aquila/grid';
+import {NxCardComponent, NxCardMainLinkDirective, NxCardSecondaryInfoDirective} from '@aposin/ng-aquila/card';
+import {NxHeadlineComponent} from '@aposin/ng-aquila/headline';
 
 @Component({
   selector: 'app-table',
@@ -22,6 +25,12 @@ import {PolicyStatus} from '../../utils/enum-policy-status';
     NxLinkComponent,
     RouterLink,
     NxBadgeComponent,
+    NxLayoutComponent,
+    NxColComponent,
+    NxCardComponent,
+    NxCardMainLinkDirective,
+    NxCardSecondaryInfoDirective,
+    NxHeadlineComponent,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss'
@@ -29,36 +38,18 @@ import {PolicyStatus} from '../../utils/enum-policy-status';
 
 export class TableComponent implements OnInit {
   policies: Policy[] = [];
-  tableElements: Policy[] = [];
   selectedRow: Policy | null = null;
-
+  insuranceService = inject(InsuranceService);
   @Input() headers: string[] = ['Policy Number', 'Insured Name', 'Coverage Amount', 'Premium', 'Status'];
-
-  constructor(private insuranceService: InsuranceService) {}
 
   ngOnInit(): void {
     this.policies = this.insuranceService.getPolicies();
-    this.tableElements = this.policies;
   }
 
   selectRow(row: Policy): void {
     this.selectedRow = row;
   }
 
-  getStatusColor(status: PolicyStatus): string {
-    switch (status) {
-      case PolicyStatus.Active:
-        return 'green';
-      case PolicyStatus.Cancelled:
-        return 'red';
-      case PolicyStatus.PendingApproval:
-        return 'orange';
-      default:
-        return 'black';
-    }
-  }
-
-  getPolicyStatus(status: string): PolicyStatus {
-    return status as PolicyStatus;
-  }
+  protected readonly getPolicyStatusColor = getPolicyStatusColor;
+  protected readonly getPolicyStatus = getPolicyStatus;
 }

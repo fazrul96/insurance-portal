@@ -1,1 +1,15 @@
-<p>claim-management works!</p>
+<div nxLayout="grid">
+  <nav aria-label="Breadcrumb">
+    <ol nxBreadcrumb appearance="link">
+      @for (item of items; track item; let i = $index; let isLast = $last) {
+        <li>
+          <a nxBreadcrumbItem [routerLink]="isLast ? null : '/'">
+            {{ item }}
+          </a>
+        </li>
+      }
+    </ol>
+  </nav>
+</div>
+
+<!--<app-file-uploader></app-file-uploader>-->

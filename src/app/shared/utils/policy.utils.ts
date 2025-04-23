@@ -16,7 +16,7 @@ export function checkPolicyStatus(coverageAmt: number): PolicyStatus {
     : PolicyStatus.PendingApproval;
 }
 
-export function getRandomCoverageAmount(): number {
+export function getCoverageAmount(): number {
   const amounts = [100000, 150000, 600000];
   return amounts[Math.floor(Math.random() * amounts.length)];
 }
@@ -29,4 +29,21 @@ export function createPolicy(insuredName: string, coverageAmt: number): Policy {
     premium: calculatePremium(coverageAmt),
     status: checkPolicyStatus(coverageAmt),
   };
+}
+
+export function getPolicyStatusColor(status: PolicyStatus): string {
+  switch (status) {
+    case PolicyStatus.Active:
+      return 'green';
+    case PolicyStatus.Cancelled:
+      return 'red';
+    case PolicyStatus.PendingApproval:
+      return 'orange';
+    default:
+      return 'black';
+  }
+}
+
+export function getPolicyStatus(status: string): PolicyStatus {
+  return status as PolicyStatus;
 }

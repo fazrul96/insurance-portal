@@ -1,26 +1,9 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,} from '@angular/core';
-import {RouterLink} from '@angular/router';
-import {NxPlainButtonComponent} from '@aposin/ng-aquila/button';
-import {
-  NxHeaderActionsDirective,
-  NxHeaderAppTitleDirective,
-  NxHeaderBrandDirective,
-  NxHeaderComponent,
-} from '@aposin/ng-aquila/header';
-import {NxIconComponent} from '@aposin/ng-aquila/icon';
+import {Component, OnInit,} from '@angular/core';
+import {NxButtonComponent} from '@aposin/ng-aquila/button';
+import {NxHeaderActionsDirective, NxHeaderBrandDirective, NxHeaderComponent,} from '@aposin/ng-aquila/header';
 import {NxLinkComponent} from '@aposin/ng-aquila/link';
-import {NxMenuButtonComponent, NxMenuComponent, NxMenuItemDirective,} from '@aposin/ng-aquila/menu';
-import {NxBreakpoints, NxViewportService} from '@aposin/ng-aquila/utils';
-import {merge, Subject} from 'rxjs';
-import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
-import {DASHBOARD_CARDS} from '../../shared/data/dashboard-cards.data';
-
-type ViewType = 'mobile' | 'tablet' | 'desktop';
-
-interface MenuItem {
-  label: string;
-  menuLink: string;
-}
+import {AuthService} from '@auth0/auth0-angular';
+import {UserDetail} from '../../core/models/user-detail.model';
 
 @Component({
   selector: 'app-header',
@@ -28,97 +11,31 @@ interface MenuItem {
     NxHeaderComponent,
     NxHeaderBrandDirective,
     NxLinkComponent,
-    NxHeaderAppTitleDirective,
     NxHeaderActionsDirective,
-    NxPlainButtonComponent,
-    NxIconComponent,
-    RouterLink,
-    NxMenuButtonComponent,
-    NxMenuComponent,
-    NxMenuItemDirective,
-
+    NxButtonComponent,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent implements OnInit, OnDestroy {
-  @ViewChild(NxMenuComponent) menu!: NxMenuComponent;
-  dashboardCards = DASHBOARD_CARDS;
+export class HeaderComponent implements OnInit {
+  constructor(public auth: AuthService) {}
+  isAuthenticated = false;
+  // userInfo: UserDetail | null = null;
 
-  protected readonly _destroyed = new Subject<void>();
-
-  viewType: ViewType = 'desktop';
-
-  constructor(
-    private readonly viewportService: NxViewportService,
-    protected readonly _cdr: ChangeDetectorRef,
-  ) {}
-
-  ngOnInit(): void {
-    this.detectScreenSize();
-  }
-
-  detectScreenSize(): void {
-    const mobile$ = this.viewportService.max(
-      NxBreakpoints.BREAKPOINT_MEDIUM,
-    );
-    const tablet$ = this.viewportService.between(
-      NxBreakpoints.BREAKPOINT_MEDIUM,
-      NxBreakpoints.BREAKPOINT_LARGE,
-    );
-    const desktop$ = this.viewportService.min(
-      NxBreakpoints.BREAKPOINT_LARGE,
-    );
-
-    merge(
-      mobile$.pipe(
-        filter(value => value),
-        map(() => 'mobile' as ViewType),
-      ),
-      tablet$.pipe(
-        filter(value => value),
-        map(() => 'tablet' as ViewType),
-      ),
-      desktop$.pipe(
-        filter(value => value),
-        map(() => 'desktop' as ViewType),
-      ),
-    )
-      .pipe(distinctUntilChanged(), takeUntil(this._destroyed))
-      .subscribe(viewType => {
-        if (
-          (viewType === 'tablet' || viewType === 'desktop') &&
-          this.menu.open
-        ) {
-          this.menu.toggle();
-        }
-        this.viewType = viewType;
-        this._cdr.markForCheck();
+    ngOnInit(): void {
+      this.auth.isAuthenticated$.subscribe((isAuth) => {
+        this.isAuthenticated = isAuth;
       });
-  }
 
-  menuData: MenuItem[] = [
-    {
-      label: 'Search',
-      menuLink: './',
-    },
-    {
-      label: 'Settings',
-      menuLink: './',
-    },
-    {
-      label: 'More information',
-      menuLink: './',
-    },
-    {
-      label: 'Notifications',
-      menuLink: './',
-    },
-  ];
-
-  ngOnDestroy(): void {
-    this._destroyed.next();
-    this._destroyed.complete();
-  }
-
+      // this.auth.user$.subscribe((user) => {
+      //   if (user) {
+      //     this.userInfo = {
+      //       fullName: user.name,
+      //       shortName: user.nickname,
+      //       email: user.email || '',
+      //       picture: user.picture,
+      //     };
+      //   }
+      // });
+    }
 }

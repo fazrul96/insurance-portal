@@ -1,41 +1,10 @@
-<div class="starter-app">
-    <app-header></app-header>
-<!--    <app-sidebar></app-sidebar>-->
-    <router-outlet></router-outlet>
-    <app-footer></app-footer>
-
-<!--  <app-experience></app-experience>-->
-</div>
-
-<!-- Copyright 2025 Allianz -->
-
-<!-- todo later remove this to its component, remove common module as well-->
-<p>Policies Purchase</p>
-<div class="kpi">{{ summary?.totalPolicies }}</div>
-
-<div class="policy-purchase-dashboard">
-  <div *ngIf="summary">
-    <h3>Policy Purchase Summary</h3>
-
-    <nx-card *ngFor="let card of purchaseCards">
-      <nx-card-header>{{ card.title }}</nx-card-header>
-      <div class="card-content">
-        <ul>
-          <li><strong>Total Policies:</strong> {{ summary.totalPolicies }}</li>
-          <li><strong>Top Policies:</strong></li>
-          <ul>
-            <li *ngFor="let policy of summary.topPolicies">
-              {{ policy.name }}: {{ policy.count }}
-            </li>
-          </ul>
-          <li><strong>Recent Purchases:</strong></li>
-          <ul>
-            <li *ngFor="let purchase of summary.recentPurchases">
-              <strong>{{ purchase.id }}</strong> - {{ purchase.customer }} ({{ purchase.policy }} on {{ purchase.date }})
-            </li>
-          </ul>
-        </ul>
-      </div>
-    </nx-card>
+<app-header></app-header>
+<div nxLayout="grid">
+  <div nxCol="12">
+<!--      <app-sidebar></app-sidebar>-->
+      <router-outlet></router-outlet>
+<!--      <app-experience></app-experience>-->
   </div>
 </div>
+<app-footer></app-footer>
+<!-- Copyright 2025 Allianz -->

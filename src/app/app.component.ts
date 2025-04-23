@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, TemplateRef, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {NxButtonModule} from '@aposin/ng-aquila/button';
@@ -19,15 +19,12 @@ import {NxPopoverModule} from '@aposin/ng-aquila/popover';
 import {NxSmallStageModule} from '@aposin/ng-aquila/small-stage';
 import {HeaderComponent} from './layout/header/header.component';
 import {FooterComponent} from './layout/footer/footer.component';
-import {SidebarComponent} from './layout/sidebar/sidebar.component';
-import {ExperienceComponent} from './shared/components/experience/experience.component';
-import {InsuranceService} from './core/services/insurance.service';
-import {NxCardComponent, NxCardHeaderComponent} from '@aposin/ng-aquila/card';
 import {CommonModule} from '@angular/common';
-import {DASHBOARD_CARDS_PRODUCTS} from './shared/data/dashboard-cards.data';
+import {FormComponent} from './shared/components/form/form.component';
+import {NxCardComponent, NxCardMainLinkDirective, NxCardSecondaryInfoDirective} from '@aposin/ng-aquila/card';
 
 @Component({
-    selector: 'app-root',
+  selector: 'app-root',
   imports: [
     CommonModule,
     FormsModule,
@@ -51,22 +48,15 @@ import {DASHBOARD_CARDS_PRODUCTS} from './shared/data/dashboard-cards.data';
     NxSmallStageModule,
     HeaderComponent,
     FooterComponent,
-    SidebarComponent,
-    ExperienceComponent,
+    FormComponent,
     NxCardComponent,
-    NxCardHeaderComponent,
+    NxCardMainLinkDirective,
+    NxCardSecondaryInfoDirective,
   ],
     templateUrl: './app.component.html',
 })
 
-export class AppComponent implements OnInit {
-    // todo remove this line until dataService line
-    purchaseCards = DASHBOARD_CARDS_PRODUCTS;
-    summary: any;
-    displayedColumns = ['id', 'customer', 'policy', 'date'];
-
-    dataService = inject(InsuranceService);
-
+export class AppComponent {
     @ViewChild('consentTemplate') consentTemplateRef!: TemplateRef<any>;
     @ViewChild('submitTemplate') submitTemplateRef!: TemplateRef<any>;
     dialogRef!: NxModalRef<any>;
@@ -98,13 +88,6 @@ export class AppComponent implements OnInit {
     closeDialog() {
         this.dialogRef.close();
     }
-  // todo remove this line
-  ngOnInit(): void {
-    this.dataService.getPolicyPurchaseSummary().subscribe(data => {
-      this.summary = data;
-    });
-  }
-
 }
 
 /** Copyright 2025 Allianz */
