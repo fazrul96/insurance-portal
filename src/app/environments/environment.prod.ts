@@ -1,8 +1,8 @@
 // import { config } from 'common-config';
 
 export const environment = {
-  production: false,
-  apiBaseUrl: 'http://localhost:8080',
+  production: true,
+  apiBaseUrl: 'http://insurance-portal.mfzrl.cyou',
   apiPrivateUrl: '/api/v1/',
   apiPublicUrl: '/api/v2/',
   auth0: {

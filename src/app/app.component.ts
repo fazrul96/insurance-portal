@@ -20,8 +20,7 @@ import {NxSmallStageModule} from '@aposin/ng-aquila/small-stage';
 import {HeaderComponent} from './layout/header/header.component';
 import {FooterComponent} from './layout/footer/footer.component';
 import {CommonModule} from '@angular/common';
-import {FormComponent} from './shared/components/form/form.component';
-import {NxCardComponent, NxCardMainLinkDirective, NxCardSecondaryInfoDirective} from '@aposin/ng-aquila/card';
+import {ExperienceComponent} from './shared/components/experience/experience.component';
 
 @Component({
   selector: 'app-root',
@@ -48,10 +47,8 @@ import {NxCardComponent, NxCardMainLinkDirective, NxCardSecondaryInfoDirective} 
     NxSmallStageModule,
     HeaderComponent,
     FooterComponent,
-    FormComponent,
-    NxCardComponent,
-    NxCardMainLinkDirective,
-    NxCardSecondaryInfoDirective,
+    ExperienceComponent,
+
   ],
     templateUrl: './app.component.html',
 })
