@@ -1,15 +1,112 @@
-<div nxLayout="grid">
-  <nav aria-label="Breadcrumb">
-    <ol nxBreadcrumb appearance="link">
-      @for (item of items; track item; let i = $index; let isLast = $last) {
-        <li>
-          <a nxBreadcrumbItem [routerLink]="isLast ? null : '/'">
-            {{ item }}
-          </a>
-        </li>
+<div nxLayout="grid" class="docs-grid-colored-grid">
+  <div nxRow>
+    <div nxCol="12" class="docs-grid-colored-col">
+      @if (successMessage) {
+        <nx-message context="success">
+          <span class="nx-font-weight-bold">Notification title:</span><br />
+          {{ successMessage }}
+        </nx-message>
       }
-    </ol>
-  </nav>
+    </div>
+  </div>
+
+  <div nxRow>
+    <div nxCol="12" class="docs-grid-colored-col">
+      <nav aria-label="Breadcrumb">
+        <ol nxBreadcrumb appearance="link">
+          @for (item of breadcrumbItems; track item; let i = $index; let isLast = $last) {
+            <li>
+              <a nxBreadcrumbItem [routerLink]="isLast ? null : '/'">
+                {{ item }}
+              </a>
+            </li>
+          }
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div nxRow>
+    @for (type of insuranceTypes; track type.title) {
+      <div nxCol="4,12" class="docs-grid-colored-col">
+        <nx-card
+          clickable
+          class="nx-margin-2xs"
+          (click)="handleCardSelection(type)"
+        >
+          <h3 nxHeadline size="l">
+            <a nxCardMainLink [routerLink]="type.route">{{ type.title }}</a>
+          </h3>
+          <p>{{ type.description }}</p>
+          <nx-link size="small">
+            <a nxCardSecondaryInfo [routerLink]="type.route">Purchase {{ type.title }}</a>
+          </nx-link>
+        </nx-card>
+        </div>
+      }
+  </div>
 </div>
 
-<app-card [cards]="purchaseCards"></app-card>
+<ng-template #templateRef>
+  <div class="centered-content">
+    <h3 nxHeadline="subsection-medium" class="nx-modal-margin-bottom">
+      Insurance Form
+    </h3>
+    <form [formGroup]="insuranceForm" (ngSubmit)="submitForm()">
+      <nx-formfield
+        label="Insurance Type"
+        appearance="outline"
+        floatLabel="always"
+      >
+        <nx-dropdown formControlName="insuredName">
+          @for (insurance of insuranceTypes; track insurance) {
+            <nx-dropdown-item [value]="insurance.title">{{ insurance.title }}</nx-dropdown-item>
+          }
+        </nx-dropdown>
+      </nx-formfield>
+
+      <nx-formfield label="Coverage Amount" appearance="outline" floatLabel="always">
+        <span nxFormfieldPrefix>RM</span>
+        <input nxInput type="number" formControlName="coverageAmt" />
+        <button
+          nxFormfieldAppendix
+          nxIconButton="tertiary small"
+          nxPopoverDirection="top"
+          [nxPopoverTriggerFor]="popoverAppearance"
+          nxPopoverTrigger="click"
+          type="button"
+          aria-label="More information"
+        >
+          <nx-icon name="info-circle-o" size="s" aria-hidden="true"></nx-icon>
+        </button>
+      </nx-formfield>
+
+      <div class="two-button-container">
+        <button
+          nxButton="primary small"
+          class="nx-margin-right-s"
+          type="submit"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<nx-popover #popoverAppearance>
+  <div style="max-width: 300px">
+    <strong>General Insurance:</strong><br />
+    Covers non-life risks such as property damage, car accidents, and travel disruptions.<br />
+    <em>Minimum Coverage:</em> RM 10,000<br /><br />
+
+    <strong>Individual Insurance:</strong><br />
+    Focuses on personal protection like health insurance, critical illness, and personal accidents.<br />
+    <em>Minimum Coverage:</em> RM 20,000<br /><br />
+
+    <strong>Life Insurance:</strong><br />
+    Provides long-term financial support to your family or beneficiaries in the event of death or disability.<br />
+    <em>Minimum Coverage:</em> RM 100,000
+  </div>
+</nx-popover>
+

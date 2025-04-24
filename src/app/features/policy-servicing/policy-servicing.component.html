@@ -1,15 +1,63 @@
-<div nxLayout="grid">
-  <nav aria-label="Breadcrumb">
-    <ol nxBreadcrumb appearance="link">
-      @for (item of items; track item; let i = $index; let isLast = $last) {
-        <li>
-          <a nxBreadcrumbItem [routerLink]="isLast ? null : '/'">
-            {{ item }}
-          </a>
-        </li>
-      }
-    </ol>
-  </nav>
-</div>
+<div nxLayout="grid" class="docs-grid-colored-grid">
+  <div nxRow>
+    <div nxCol="12" class="docs-grid-colored-col">
+      <nav aria-label="Breadcrumb">
+        <ol nxBreadcrumb appearance="link">
+          @for (item of breadcrumbItems; track item; let i = $index; let isLast = $last) {
+            <li>
+              <a nxBreadcrumbItem [routerLink]="isLast ? null : '/'">
+                {{ item }}
+              </a>
+            </li>
+          }
+        </ol>
+      </nav>
+    </div>
+  </div>
 
-<app-table></app-table>
+  <div nxRow>
+    <div nxCol="12" class="docs-grid-colored-col">
+      <div class="scroll-container">
+        <table nxTable class="nx-table--scrollable">
+          <thead>
+            <tr nxTableRow>
+              @for (header of headers; track header) {
+                <th nxHeaderCell>{{header}}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of policies; track item) {
+              <tr nxTableRow (click)="selectRow(item)">
+                <td nxTableCell>{{item.policyNumber}}</td>
+                <td nxTableCell>{{item.insuredName}}</td>
+                <td nxTableCell>{{item.coverageAmt}}</td>
+                <td nxTableCell>{{item.premium}}</td>
+                <td nxTableCell>
+                  <span [style.color]="getPolicyStatusColor(getPolicyStatus(item.status))">
+                    {{ item.status }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (selectedRow) {
+          <div class="policy-details">
+            <h3>Insurance Details</h3>
+            <p><strong>Policy Number:</strong> {{ selectedRow.policyNumber }}</p>
+            <p><strong>Insured Name:</strong> {{ selectedRow.insuredName }}</p>
+            <p><strong>Coverage Amount:</strong> {{ selectedRow.coverageAmt }}</p>
+            <p><strong>Premium:</strong> {{ selectedRow.premium }}</p>
+            <p><strong>Status:</strong>
+              <span [style.color]="getPolicyStatusColor(getPolicyStatus(selectedRow.status))">
+                {{ selectedRow.status }}
+              </span>
+            </p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
