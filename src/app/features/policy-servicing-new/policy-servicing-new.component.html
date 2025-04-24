@@ -1,0 +1,52 @@
+<nx-tab-group>
+  <nx-tab [label]="'Allianz Life (' + lifePolicyCount + ')'">
+    <ng-template nxTabContent>
+      <p class="text-center">You have {{ lifePolicyCount }} policies</p>
+
+      <div class="scroll-container">
+        <table nxTable nxSort (sortChange)="sortTable($event)">
+          <thead>
+          <tr nxTableRow>
+            <th nxHeaderCell nxSortHeaderCell="employer">Employer</th>
+            <th nxHeaderCell>Policy. No</th>
+            <th nxHeaderCell>Benefit</th>
+            <th nxHeaderCell nxSortHeaderCell="effectiveDate">Effective Date</th>
+            <th nxHeaderCell nxSortHeaderCell="expiryDate">Expiry Date</th>
+            <th nxHeaderCell nxSortHeaderCell="status">Status</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (item of policyList; track item) {
+              <tr nxTableRow>
+                <td nxTableCell>
+                  <nx-link><a routerLink="/">{{item.employer}}</a></nx-link>
+                </td>
+                <td nxTableCell>{{item.policyNumber}}</td>
+                <td nxTableCell>{{item.benefit}}</td>
+                <td nxTableCell>{{ item.effectiveDate | date: 'dd/MM/yyyy' }}</td>
+                <td nxTableCell>{{ item.expiryDate | date: 'dd/MM/yyyy' }}</td>
+                <td nxTableCell>
+                  <nx-badge [type]="item.status"
+                  >{{item.status}}</nx-badge
+                  >
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </ng-template>
+  </nx-tab>
+
+  <nx-tab [label]="'Allianz General (' + generalPolicyCount + ')'">
+    <ng-template nxTabContent>
+      <p>You have {{ generalPolicyCount }} policies</p>
+    </ng-template>
+  </nx-tab>
+
+  <nx-tab [label]="'Employee Benefits (' + employeePolicyCount + ')'">
+    <ng-template nxTabContent>
+      <p>You have {{ employeePolicyCount }} policies</p>
+    </ng-template>
+  </nx-tab>
+</nx-tab-group>
