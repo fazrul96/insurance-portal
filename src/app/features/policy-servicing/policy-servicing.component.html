@@ -1,15 +1,16 @@
-<div nxLayout="grid">
-  <nav aria-label="Breadcrumb">
-    <ol nxBreadcrumb appearance="link">
-      @for (item of items; track item; let i = $index; let isLast = $last) {
-        <li>
-          <a nxBreadcrumbItem [routerLink]="isLast ? null : '/'">
-            {{ item }}
-          </a>
-        </li>
-      }
-    </ol>
-  </nav>
-</div>
+<!--<div nxLayout="grid">-->
+<!--  <nav aria-label="Breadcrumb">-->
+<!--    <ol nxBreadcrumb appearance="link">-->
+<!--      @for (item of items; track item; let i = $index; let isLast = $last) {-->
+<!--        <li>-->
+<!--          <a nxBreadcrumbItem [routerLink]="isLast ? null : '/'">-->
+<!--            {{ item }}-->
+<!--          </a>-->
+<!--        </li>-->
+<!--      }-->
+<!--    </ol>-->
+<!--  </nav>-->
+<!--</div>-->
 
-<app-table></app-table>
+<!--<app-table></app-table>-->
+<app-policy-servicing-new></app-policy-servicing-new>

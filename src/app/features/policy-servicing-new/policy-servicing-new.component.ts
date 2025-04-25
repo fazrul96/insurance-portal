@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {NxTabComponent, NxTabContentDirective, NxTabGroupComponent} from '@aposin/ng-aquila/tabs';
+import {NxTabComponent, NxTabGroupComponent} from '@aposin/ng-aquila/tabs';
 import {
   NxHeaderCellDirective,
   NxSortDirective,
@@ -13,7 +13,7 @@ import {
 import {NxLinkComponent} from '@aposin/ng-aquila/link';
 import {RouterLink} from '@angular/router';
 import {NxBadgeComponent} from '@aposin/ng-aquila/badge';
-import {DatePipe} from '@angular/common';
+import {DatePipe, NgClass} from '@angular/common';
 
 interface Policy {
   employer: string;
@@ -29,7 +29,6 @@ interface Policy {
   imports: [
     NxTabGroupComponent,
     NxTabComponent,
-    NxTabContentDirective,
     NxTableComponent,
     NxSortDirective,
     NxTableRowComponent,
@@ -40,12 +39,16 @@ interface Policy {
     RouterLink,
     NxBadgeComponent,
     DatePipe,
+    NgClass,
+
   ],
   templateUrl: './policy-servicing-new.component.html',
   styleUrl: './policy-servicing-new.component.scss'
 })
 export class PolicyServicingNewComponent {
-  policyList: Policy[] = [
+  lifePolicyList: never[] = [];
+  generalPolicyList: never[] = [];
+  employeePolicyList: Policy[] = [
     {
       employer: 'ACCENTURE TECHNOLOGY SOLUTIONS SDN. BHD.',
       policyNumber: 'G125677-000',
@@ -56,29 +59,29 @@ export class PolicyServicingNewComponent {
     },
     {
       employer: 'ACCENTURE TECHNOLOGY SOLUTIONS SDN. BHD.',
-      policyNumber: 'G125677-000',
-      benefit: 'Group Outpatient Clinical',
+      policyNumber: 'G125728-000',
+      benefit: 'Group Hospitalisation & Surgical',
       effectiveDate: new Date('1/3/2020'),
       expiryDate: new Date('1/3/2020'),
       status: 'In Force',
     },
     {
       employer: 'ACCENTURE TECHNOLOGY SOLUTIONS SDN. BHD.',
-      policyNumber: 'G125677-000',
-      benefit: 'Group Outpatient Clinical',
+      policyNumber: 'G125828-000',
+      benefit: 'Group Term Life',
       effectiveDate: new Date('1/3/2020'),
       expiryDate: new Date('1/3/2020'),
       status: 'In Force',
     }
   ];
 
-  lifePolicyCount: number = this.policyList.length;
-  generalPolicyCount: number = 0;
-  employeePolicyCount: number = 0;
+  lifePolicyCount: number = this.lifePolicyList.length;
+  generalPolicyCount: number = this.generalPolicyList.length;
+  employeePolicyCount: number = this.employeePolicyList.length;
 
   sortTable(sort: SortEvent): void {
     const { active, direction } = sort;
-    this.policyList.sort((a: any, b: any) =>
+    this.employeePolicyList.sort((a: any, b: any) =>
       this.compare(a[active], b[active], direction)
     );
   }

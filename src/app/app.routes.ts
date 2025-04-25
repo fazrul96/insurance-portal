@@ -4,6 +4,7 @@ import {PolicyServicingComponent} from './features/policy-servicing/policy-servi
 import {ClaimManagementComponent} from './features/claim-management/claim-management.component';
 import {DashboardComponent} from './features/dashboard/dashboard.component';
 import {AuthGuard} from '@auth0/auth0-angular';
+import {PolicyDetailsComponent} from './features/policy-details/policy-details.component';
 
 export const ROUTE_PATHS = {
   root: '',
@@ -11,6 +12,7 @@ export const ROUTE_PATHS = {
   dashboard: 'dashboard',
   policyPurchase: 'policy-purchase',
   policyServicing: 'policy-servicing',
+  policyDetails: 'policy-details',
   claimManagement: 'claim-management'
 };
 
@@ -20,6 +22,7 @@ export const routes: Routes = [
   { path: ROUTE_PATHS.dashboard, component: DashboardComponent },
   { path: ROUTE_PATHS.policyPurchase, component: PolicyPurchaseComponent, canActivate: [AuthGuard] },
   { path: ROUTE_PATHS.policyServicing, component: PolicyServicingComponent, canActivate: [AuthGuard] },
+  { path: ROUTE_PATHS.policyDetails, component: PolicyDetailsComponent, canActivate: [AuthGuard] },
   { path: ROUTE_PATHS.claimManagement, component: ClaimManagementComponent, canActivate: [AuthGuard] },
   // {
   //   path: 'login/callback',
