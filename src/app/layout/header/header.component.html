@@ -1,4 +1,9 @@
-<header nx-header>
+<app-login-notification
+  (panelTemplate)="notificationPanelTemplate = $event"
+  (logoutClick)="auth.logout()"
+></app-login-notification>
+
+<header nx-header style="margin-top: 0.5rem">
   <nx-header-row>
     <div class="header-container">
     <nx-header-brand>
@@ -16,9 +21,12 @@
         </nx-header-actions>
 
         <nx-header-actions showSeparator class="cobranding">
-          <button nxButton="secondary small" type="button" (click)="auth.logout()">Logout</button>
+          <span class="invisible-spacer" aria-hidden="true"></span>
+        </nx-header-actions>
+        <nx-header-actions showSeparator class="cobranding">
+<!--          <button nxButton="secondary small" type="button" (click)="auth.logout()">Logout</button>-->
           @if (userInfo?.picture) {
-            <figure nxFigure="rounded" class="avatar-figure">
+            <figure nxFigure="rounded" class="avatar-figure" [nxNotificationPanelTriggerFor]="notificationPanelTemplate">
               <img [src]="userInfo?.picture" alt="Profile Picture" />
             </figure>
           } @else {
@@ -27,7 +35,7 @@
         </nx-header-actions>
       } @else {
         <nx-header-actions showSeparator class="cobranding">
-          <button nxButton="secondary small" type="button" (click)="auth.loginWithRedirect()">Login</button>-->
+          <button nxButton="secondary small" type="button" (click)="auth.loginWithRedirect()">Login</button>
         </nx-header-actions>
       }
     } @if (isMobile){
@@ -85,14 +93,7 @@
       </nx-header-navigation>
 
       <nx-header-actions>
-<!--        todo recheck this part-->
-<!--        <button nxButton>-->
-<!--          <nx-icon name="user-o" aria-hidden="true"></nx-icon>-->
-<!--        </button>-->
-<!--        <div>-->
-<!--          <nx-icon name="plus" font="fa" size="m" aria-hidden="true"></nx-icon>-->
-<!--          <nx-status-icon type="info" size="m"></nx-status-icon>-->
-<!--        </div>-->
+        <nx-status-icon type="info" size="m"></nx-status-icon>
       </nx-header-actions>
     </nx-header-row>
   }

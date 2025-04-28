@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild,} from '@angular/core';
+import {ChangeDetectorRef, Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild,} from '@angular/core';
 import {NxButtonComponent, NxPlainButtonComponent} from '@aposin/ng-aquila/button';
 import {
   NxHeaderActionsDirective,
@@ -20,6 +20,10 @@ import {NxIconComponent, NxStatusIconComponent} from '@aposin/ng-aquila/icon';
 import {NxFigureComponent} from '@aposin/ng-aquila/image';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {DatePipe} from '@angular/common';
+import {
+  LoginNotificationComponent
+} from '../../shared/components/notification/login-notification/login-notification.component';
+import {NxNotificationPanelTriggerDirective} from '@aposin/ng-aquila/notification-panel';
 
 type ViewType = 'mobile' | 'tablet' | 'desktop';
 
@@ -49,6 +53,8 @@ interface MenuItem {
     NxHeaderNavigationComponent,
     NxHeaderNavigationItemDirective,
     RouterLinkActive,
+    LoginNotificationComponent,
+    NxNotificationPanelTriggerDirective,
     NxStatusIconComponent,
   ],
   templateUrl: './header.component.html',
@@ -56,6 +62,7 @@ interface MenuItem {
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild(NxMenuComponent) menu!: NxMenuComponent;
+  notificationPanelTemplate!: TemplateRef<any>;
 
   readonly auth: AuthService = inject(AuthService);
   private readonly viewportService: NxViewportService = inject(NxViewportService)
