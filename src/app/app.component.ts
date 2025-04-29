@@ -20,6 +20,7 @@ import {NxSmallStageModule} from '@aposin/ng-aquila/small-stage';
 import {HeaderComponent} from './layout/header/header.component';
 import {FooterComponent} from './layout/footer/footer.component';
 import {CommonModule} from '@angular/common';
+import {ExperienceComponent} from './shared/components/experience/experience.component';
 
 @Component({
   selector: 'app-root',
@@ -46,6 +47,8 @@ import {CommonModule} from '@angular/common';
     NxSmallStageModule,
     HeaderComponent,
     FooterComponent,
+
+    ExperienceComponent,
 
   ],
     templateUrl: './app.component.html',

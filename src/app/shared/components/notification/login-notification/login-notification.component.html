@@ -1,0 +1,21 @@
+<ng-template #notificationPanelTemplate>
+  <nx-notification-panel>
+    <a nxNotificationPanelItem [routerLink]="profileLink">
+      <nx-notification-item-content>
+        <nx-icon [name]="profileIcon" aria-hidden="true" style="padding-right: 1rem"></nx-icon>
+        <span class="nx-font-weight-semibold">Profile</span>
+      </nx-notification-item-content>
+    </a>
+    <a nxNotificationPanelItem (click)="onLogoutClick()">
+      <nx-notification-item-content>
+        <nb-icon
+          [icon]="logoutIcon"
+          aria-hidden="true" >
+        </nb-icon>
+<!--        <nx-icon [name]="logoutIcon" aria-hidden="true" style="padding-right: 1rem"></nx-icon>-->
+        <span class="nx-font-weight-semibold">Log out</span>
+      </nx-notification-item-content>
+    </a>
+  </nx-notification-panel>
+</ng-template>
+
