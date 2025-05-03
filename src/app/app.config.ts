@@ -7,7 +7,7 @@ import {provideHttpClient, withInterceptors} from '@angular/common/http';
 
 import {routes} from './app.routes';
 import {provideAuth0} from '@auth0/auth0-angular';
-import {environment} from './environments/environment';
+import {environment} from '../environments/environment';
 import {authInterceptor} from './core/interceptors/auth.interceptor';
 import {loggingHttpInterceptor} from './core/interceptors/logging-http.interceptor';
 

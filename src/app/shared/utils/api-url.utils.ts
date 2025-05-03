@@ -1,4 +1,4 @@
-import {environment} from '../../environments/environment';
+import {environment} from '../../../environments/environment';
 
 export function buildApiUrl(endpoint: string, isPrivate: boolean = false): string {
   const baseUrl = environment.apiBaseUrl;
