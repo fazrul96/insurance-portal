@@ -47,6 +47,7 @@ import {ExperienceComponent} from './shared/components/experience/experience.com
     NxSmallStageModule,
     HeaderComponent,
     FooterComponent,
+
     ExperienceComponent,
 
   ],
