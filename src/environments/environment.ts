@@ -2,7 +2,8 @@
 
 export const environment = {
   production: true,
-  apiBaseUrl: 'http://insurance-portal.mfzrl.cyou',
+  apiBaseUrl: 'https://spring-boot-app.mfzrl.cyou',
+  apiUrl: '/api/',
   apiPrivateUrl: '/api/v1/',
   apiPublicUrl: '/api/v2/',
   auth0: {

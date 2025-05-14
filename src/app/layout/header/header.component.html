@@ -25,13 +25,14 @@
         </nx-header-actions>
         <nx-header-actions showSeparator class="cobranding">
 <!--          <button nxButton="secondary small" type="button" (click)="auth.logout()">Logout</button>-->
-          @if (userInfo?.picture) {
-            <figure nxFigure="rounded" class="avatar-figure" [nxNotificationPanelTriggerFor]="notificationPanelTemplate">
-              <img [src]="userInfo?.picture" alt="Profile Picture" />
-            </figure>
-          } @else {
-            <span class="avatar-initials">{{ userInitials }}</span>
-          }
+<!--          @if (userInfo?.picture) {-->
+<!--            <figure nxFigure="rounded" class="avatar-figure" [nxNotificationPanelTriggerFor]="notificationPanelTemplate">-->
+<!--              <img [src]="userInfo?.picture" alt="Profile Picture" />-->
+<!--            </figure>-->
+<!--          } @else {-->
+<!--            <span class="avatar-initials">{{ userInitials }}</span>-->
+<!--          }-->
+          Test here
         </nx-header-actions>
       } @else {
         <nx-header-actions showSeparator class="cobranding">

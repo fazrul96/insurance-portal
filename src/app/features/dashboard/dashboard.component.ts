@@ -1,32 +1,45 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {CardComponent} from '../../shared/components/card/card.component';
-import {CardItem, DASHBOARD_CARDS} from '../../shared/data/dashboard-cards.data';
-import {InsuranceService} from '../../core/services/insurance.service';
-import {Observable} from 'rxjs';
-import {AsyncPipe} from '@angular/common';
-import {AuthService} from '@auth0/auth0-angular';
+import {NxColComponent, NxLayoutComponent, NxRowComponent,} from '@aposin/ng-aquila/grid';
+import {NxLinkComponent} from '@aposin/ng-aquila/link';
+import {Router} from '@angular/router';
+import {Store} from '@ngxs/store';
+import {PolicyProductDetails} from '../../store/policy-product/policy-product.action';
+import {PolicyProductState} from '../../store/policy-product/policy-product.state';
+import {UserState} from '../../store/user/user.state';
+import {PolicyProductService} from '../../core/services/policy-product.service';
+import {PolicyDetails} from '../../core/models/policy.model';
 
 @Component({
-  selector: 'app-dashboard',
-  imports: [
-    CardComponent,
-    AsyncPipe,
-  ],
+  selector: 'app-policy-product',
+  imports: [NxLayoutComponent, NxColComponent, NxRowComponent, NxLinkComponent],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+  styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
-  auth: AuthService = inject(AuthService);
-  insuranceService: InsuranceService = inject(InsuranceService)
+  private router = inject(Router);
+  private store = inject(Store);
+  private policyProductService =  inject(PolicyProductService);
+  numOfPolicy: number = 0;
 
-  dashboardCards: CardItem[] = DASHBOARD_CARDS;
-  insuranceTypes$: Observable<CardItem[]> | null = null;
-  isAuthenticated = false;
-
-  ngOnInit(): void {
-    this.auth.isAuthenticated$.subscribe((isAuth) => {
-      this.isAuthenticated = isAuth;
+  ngOnInit() {
+    const user = this.store.selectSnapshot(UserState.getUser);
+    this.policyProductService.getAllPolicies(user).subscribe({
+      next: (response: any): void => {
+        this.store.dispatch(new PolicyProductDetails(response));
+        const policyProduct: PolicyDetails[] = this.store.selectSnapshot(PolicyProductState.getPolicyDetailsList);
+        this.numOfPolicy = policyProduct.length;
+      },
+      error: (error): void => {
+        console.error('❌ API call failed:', error);
+      }
     });
-    this.insuranceTypes$ = this.insuranceService.getInsuranceTypes();
+  }
+
+  goToUserPolicies() {
+    this.router.navigate(['policy-servicing']);
+  }
+
+  goToInitialForm() {
+    this.router.navigate(['policy-purchase']);
   }
 }

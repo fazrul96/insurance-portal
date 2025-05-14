@@ -3,6 +3,7 @@
 export const environment = {
   production: false,
   apiBaseUrl: 'http://localhost:8080',
+  apiUrl: '/api/',
   apiPrivateUrl: '/api/v1/',
   apiPublicUrl: '/api/v2/',
   auth0: {

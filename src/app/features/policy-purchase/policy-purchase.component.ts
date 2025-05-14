@@ -1,118 +1,134 @@
-import {Component, inject, TemplateRef, ViewChild} from '@angular/core';
-import {CardItem, DASHBOARD_CARDS_PRODUCTS} from '../../shared/data/dashboard-cards.data';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {NxInputDirective} from '@aposin/ng-aquila/input';
-import {NxBreadcrumbComponent, NxBreadcrumbItemComponent} from '@aposin/ng-aquila/breadcrumb';
-import {Router, RouterLink} from '@angular/router';
-import {NxColComponent, NxLayoutComponent, NxRowComponent} from '@aposin/ng-aquila/grid';
-import {NxDialogService, NxModalRef} from '@aposin/ng-aquila/modal';
-import {NxCardComponent, NxCardMainLinkDirective, NxCardSecondaryInfoDirective} from '@aposin/ng-aquila/card';
-import {NxButtonComponent, NxIconButtonComponent} from '@aposin/ng-aquila/button';
-import {NxHeadlineComponent} from '@aposin/ng-aquila/headline';
-import {NxLinkComponent} from '@aposin/ng-aquila/link';
+import {Component, inject, OnInit} from '@angular/core';
 import {
-  NxFormfieldAppendixDirective,
-  NxFormfieldComponent,
-  NxFormfieldPrefixDirective
-} from '@aposin/ng-aquila/formfield';
-import {NxMessageComponent} from '@aposin/ng-aquila/message';
-import {NxDropdownComponent, NxDropdownItemComponent} from '@aposin/ng-aquila/dropdown';
-import {NxIconComponent} from '@aposin/ng-aquila/icon';
-import {NxPopoverComponent, NxPopoverTriggerDirective} from '@aposin/ng-aquila/popover';
-import {ROUTE_PATHS} from '../../app.routes';
-import {InsuranceService} from '../../core/services/insurance.service';
+  PolicyPurchaseInitialInfoComponent
+} from '../policy-purchase-initial-info/policy-purchase-initial-info.component';
+import {NxCardComponent, NxCardSecondaryInfoDirective,} from '@aposin/ng-aquila/card';
+import {NxHeadlineComponent} from '@aposin/ng-aquila/headline';
+import {NxProgressStepperComponent, NxStepComponent,} from '@aposin/ng-aquila/progress-stepper';
+import {PolicyPurchasePlanComponent} from '../policy-purchase-plan/policy-purchase-plan.component';
+import {PolicyPurchaseSummaryComponent} from '../policy-purchase-summary/policy-purchase-summary.component';
+import {ReactiveFormsModule,} from '@angular/forms';
+import {Store} from '@ngxs/store';
+import {PolicyPurchaseState} from '../../store/policy/policy-purchase.state';
+import {SubmitPolicyPurchaseStep, SubmitPolicyPurchaseSubStep} from '../../store/policy/policy-purchase.action';
+import {ProgressbarComponent} from '../progress-bar/progressbar.component';
+import {NxColComponent, NxLayoutComponent, NxRowComponent} from '@aposin/ng-aquila/grid';
+import {
+  PolicyPurchaseInsuredInfoComponent
+} from '../policy-purchase-insured-info/policy-purchase-insured-info.component';
+import {PolicyPurchaseReceiptComponent} from '../policy-purchase-receipt/policy-purchase-receipt.component';
+import {NgClass} from '@angular/common';
+import {PolicyPurchaseStep} from "../../core/models/policy.model";
 
 @Component({
   selector: 'app-policy-purchase',
   imports: [
-    FormsModule,
-    NxBreadcrumbComponent,
-    NxBreadcrumbItemComponent,
-    RouterLink,
-    NxLayoutComponent,
+    PolicyPurchaseInitialInfoComponent,
     NxCardComponent,
-    ReactiveFormsModule,
-    NxButtonComponent,
-    NxHeadlineComponent,
-    NxRowComponent,
-    NxColComponent,
-    NxCardMainLinkDirective,
     NxCardSecondaryInfoDirective,
-    NxLinkComponent,
-    NxFormfieldComponent,
-    NxMessageComponent,
-    NxDropdownComponent,
-    NxDropdownItemComponent,
-    NxFormfieldAppendixDirective,
-    NxFormfieldPrefixDirective,
-    NxIconButtonComponent,
-    NxIconComponent,
-    NxInputDirective,
-    NxPopoverTriggerDirective,
-    NxPopoverComponent
+    NxHeadlineComponent,
+    NxProgressStepperComponent,
+    NxStepComponent,
+    PolicyPurchasePlanComponent,
+    PolicyPurchaseSummaryComponent,
+    ReactiveFormsModule,
+    ProgressbarComponent,
+    NxColComponent,
+    NxLayoutComponent,
+    NxRowComponent,
+    PolicyPurchaseInsuredInfoComponent,
+    PolicyPurchaseReceiptComponent,
+    NgClass,
   ],
   templateUrl: './policy-purchase.component.html',
-  styleUrl: './policy-purchase.component.scss'
+  styleUrl: './policy-purchase.component.scss',
 })
-export class PolicyPurchaseComponent {
-  readonly breadcrumbItems: string[] = ['Home', 'Policy Purchase'];
-  readonly insuranceTypes: CardItem[] = DASHBOARD_CARDS_PRODUCTS;
+export class PolicyPurchaseComponent implements OnInit {
+  store: Store = inject(Store);
 
-  successMessage: string = '';
-  selectedPolicyCard: CardItem | null = null;
+  currentStep: number = 1;
+  currentSubStep: number = 1;
+  currentPath: string = 'basic-information';
+  currentSubPath: string = 'info-details';
+  paymentStatus: number | null = null;
 
-  @ViewChild('templateRef') templateRef!: TemplateRef<any>;
-  private templateDialogRef?: NxModalRef<any>;
+  mainSteps: PolicyPurchaseStep[] = [];
+  subSteps: PolicyPurchaseStep[] = [];
 
-  insuranceForm: FormGroup;
+  initSteps(): void {
+    this.store.select(PolicyPurchaseState.getMainSteps).subscribe(steps => {
+      this.mainSteps = steps;
+      this.submitStep(this.currentStep, this.currentPath);
+    });
 
-  private readonly insuranceService = inject(InsuranceService);
-  private readonly router = inject(Router);
-  private readonly formBuilder = inject(FormBuilder);
-  private readonly dialogService = inject(NxDialogService);
-
-  constructor() {
-    this.insuranceForm = this.createInsuranceForm();
-  }
-
-  private createInsuranceForm(): FormGroup {
-    return this.formBuilder.group({
-      insuredName: this.formBuilder.control('', Validators.required),
-      coverageAmt: this.formBuilder.control(10000, [Validators.required, Validators.min(10000)]),
+    this.store.select(PolicyPurchaseState.getSubSteps).subscribe(steps => {
+      this.subSteps = steps;
+      this.submitSubStep(this.currentSubStep, this.currentSubPath);
     });
   }
 
-  handleCardSelection(card: CardItem): void {
-    this.selectedPolicyCard = card;
-    this.insuranceForm.patchValue({ insuredName: card.title });
-    this.openModal();
+  submitStep(step: number, path: string): void {
+    this.store.dispatch(new SubmitPolicyPurchaseStep({ step: step, path: path }));
   }
 
-  openModal(): void {
-    this.templateDialogRef = this.dialogService.open(this.templateRef, {
-      ariaLabel: 'Insurance Application Modal',
-    });
+  submitSubStep(step: number, path: string): void {
+    this.store.dispatch(new SubmitPolicyPurchaseSubStep({ step: step, path: path }));
   }
 
-  closeModal(): void {
-    this.templateDialogRef?.close();
+  onPaymentResult(status: number) {
+    this.paymentStatus = status;
   }
 
-  submitForm(): void {
-    if (this.insuranceForm.invalid) return;
+  formatCamelCase(path: string): string {
+    return path
+      .split('-')
+      .map((word) => {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join(' ');
+  }
 
-    const { insuredName, coverageAmt } = this.insuranceForm.value;
+  ngOnInit(): void {
+    this.initSteps();
+  }
 
-    this.insuranceService.addPolicy({ insuredName, coverageAmt });
+  onStepChange(newStep: number, path: string): void {
+    this.submitStep(newStep, path);
+  }
 
-    this.successMessage = `🎉 Successfully purchased ${insuredName} policy with RM${coverageAmt} coverage.`;
+  onSubStepChange(newStep: number, path: string): void {
+    this.submitSubStep(newStep, path);
+  }
 
-    this.closeModal();
-    this.insuranceForm.reset();
-    this.selectedPolicyCard = null;
+  nextStep(): void {
+    if (this.currentStep < this.mainSteps.length) {
+      const nextStep: PolicyPurchaseStep = this.mainSteps[this.currentStep];
+      this.onStepChange(nextStep.step, nextStep.path);
+      this.currentStep++;
+    }
+  }
 
-    setTimeout(() => {
-      this.router.navigate([ROUTE_PATHS.policyServicing]);
-    }, 1500);
+  nextSubStep(): void {
+    if (this.currentSubStep < this.subSteps.length) {
+      const nextStep: PolicyPurchaseStep = this.subSteps[this.currentSubStep];
+      this.onSubStepChange(nextStep.step, nextStep.path);
+      this.currentSubStep++;
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep > 1) {
+      const prevStep: PolicyPurchaseStep = this.mainSteps[this.currentStep - 2];
+      this.onStepChange(prevStep.step, prevStep.path);
+      this.currentStep--;
+    }
+  }
+
+  prevSubStep(): void {
+    if (this.currentSubStep > 1) {
+      const prevStep: PolicyPurchaseStep = this.subSteps[this.currentSubStep - 2];
+      this.onSubStepChange(prevStep.step, prevStep.path);
+      this.currentSubStep--;
+    }
   }
 }

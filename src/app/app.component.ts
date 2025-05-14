@@ -1,91 +1,62 @@
-import {Component, TemplateRef, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {RouterModule} from '@angular/router';
-import {NxButtonModule} from '@aposin/ng-aquila/button';
-import {NxCheckboxModule} from '@aposin/ng-aquila/checkbox';
-import {NxDocumentationIconModule} from '@aposin/ng-aquila/documentation-icons';
-import {NxDropdownModule} from '@aposin/ng-aquila/dropdown';
-import {NxFooterModule} from '@aposin/ng-aquila/footer';
-import {NxFormfieldModule} from '@aposin/ng-aquila/formfield';
-import {NxGridModule} from '@aposin/ng-aquila/grid';
-import {NxHeadlineModule} from '@aposin/ng-aquila/headline';
-import {NxIconModule} from '@aposin/ng-aquila/icon';
-import {NxInputModule} from '@aposin/ng-aquila/input';
-import {NxLinkModule} from '@aposin/ng-aquila/link';
-import {NxMessageModule} from '@aposin/ng-aquila/message';
-import {NxDialogService, NxModalModule, NxModalRef} from '@aposin/ng-aquila/modal';
-import {NxOverlayModule} from '@aposin/ng-aquila/overlay';
-import {NxPopoverModule} from '@aposin/ng-aquila/popover';
-import {NxSmallStageModule} from '@aposin/ng-aquila/small-stage';
-import {HeaderComponent} from './layout/header/header.component';
-import {FooterComponent} from './layout/footer/footer.component';
-import {CommonModule} from '@angular/common';
-import {ExperienceComponent} from './shared/components/experience/experience.component';
+import {Component, inject, OnDestroy, OnInit, signal, Signal} from '@angular/core';
+import {NavigationEnd, Router, RouterModule} from '@angular/router';
+import {Store} from '@ngxs/store';
+import {Subject, takeUntil} from 'rxjs';
+import {routes} from './app.routes';
+import {UserState} from './store/user/user.state';
+import {LoadingSpinnerComponent} from './shared/components/loading-spinner/loading-spinner.component';
+import {SiteHeaderComponent} from './layout/site-header/site-header.component';
+import {SiteFooterComponent} from './layout/site-footer/site-footer.component';
 
 @Component({
   selector: 'app-root',
   imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
     RouterModule,
-    NxButtonModule,
-    NxCheckboxModule,
-    NxDocumentationIconModule,
-    NxDropdownModule,
-    NxFooterModule,
-    NxFormfieldModule,
-    NxGridModule,
-    NxHeadlineModule,
-    NxIconModule,
-    NxInputModule,
-    NxLinkModule,
-    NxMessageModule,
-    NxModalModule,
-    NxOverlayModule,
-    NxPopoverModule,
-    NxSmallStageModule,
-    HeaderComponent,
-    FooterComponent,
-
-    ExperienceComponent,
-
+    SiteHeaderComponent,
+    SiteFooterComponent,
+    LoadingSpinnerComponent
   ],
-    templateUrl: './app.component.html',
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
 })
+export class AppComponent implements OnInit, OnDestroy {
+  showSiteHeader: boolean = false;
+  showSiteFooter: boolean = true;
+  isLoggedIn: Signal<boolean> = signal(false);
 
-export class AppComponent {
-    @ViewChild('consentTemplate') consentTemplateRef!: TemplateRef<any>;
-    @ViewChild('submitTemplate') submitTemplateRef!: TemplateRef<any>;
-    dialogRef!: NxModalRef<any>;
-    formGroup: FormGroup;
+  private appRoutes = routes;
+  private router = inject(Router);
+  private store = inject(Store);
+  private unsubscribe$ = new Subject();
 
-    constructor(readonly dialogService: NxDialogService) {
-        this.formGroup = new FormBuilder().group({
-            name: ['', Validators.required],
-            items: ['', Validators.required],
-            email: ['', [Validators.email, Validators.required]],
-            consent: [false, Validators.requiredTrue],
-        });
-    }
+  ngOnInit(): void {
+    this.routesListener();
+    this.isLoggedIn = this.store.selectSignal(UserState.isLoggedIn);
+  }
 
-    openConsentDialog(): void {
-        this.dialogRef = this.dialogService.open(this.consentTemplateRef, {
-            ariaLabel: 'A modal with content',
-            showCloseIcon: true,
-        });
-    }
+  private routesListener(): void {
+    this.router.events
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          if (!event.urlAfterRedirects.includes('login')) {
+            this.showSiteHeader = true;
+          } else {
+            this.showSiteHeader = false;
+          }
 
-    openSubmitDialog(): void {
-        this.dialogRef = this.dialogService.open(this.submitTemplateRef, {
-            ariaLabel: 'The final modal of the Starter App',
-            showCloseIcon: false,
-        });
-    }
+          if (!this.appRoutes.find((route) =>
+            event.urlAfterRedirects.includes(route.path ? route.path : '') && route.path !== ''
+          )) {
+            this.showSiteHeader = false;
+            this.showSiteFooter = false;
+          }
+        }
+      });
+  }
 
-    closeDialog() {
-        this.dialogRef.close();
-    }
+  ngOnDestroy(): void {
+    this.unsubscribe$.next('');
+    this.unsubscribe$.complete();
+  }
 }
-
-/** Copyright 2025 Allianz */

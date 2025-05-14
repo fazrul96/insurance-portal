@@ -1,61 +1,72 @@
-@if (isAuthenticated) {
-  <app-card [cards]="dashboardCards"></app-card>
-} @else {
-  <div class="big-card-image">
-<!--    <img src="assets/logos/aposin_logo.ico" alt="Please log in to see your dashboard" />-->
-    <p class="login-message">Please log in to access your dashboard.</p>
+<body>
+<div nxLayout="grid nogutters" class="grid">
+  <div nxRow class="grid-row">
+    <div
+      nxCol="12,12,12,12"
+      style="background-image: url(../../../assets/images/views/banner_policy-purchase.jpeg)"
+      class="policy-product-banner"
+    >
+      <div class="banner-content">
+        <div class="banner-title">
+          <p>Allianz i-Essential <br />Cover Life Insurance</p>
+        </div>
+        <p>
+          An affordable life insurance plan that covers death and total
+          permanent disability
+        </p>
+      </div>
+    </div>
   </div>
-}
 
-<!-- todo later remove this to its component, remove common module as well-->
-<!--<div class="policy-purchase-dashboard">-->
-<!--  <div *ngIf="summary">-->
-<!--    <h3>Policy Purchase Summary</h3>-->
-
-<!--    <nx-card *ngFor="let card of purchaseCards">-->
-<!--      <nx-card-header>{{ card.title }}</nx-card-header>-->
-<!--      <div class="card-content">-->
-<!--        <ul>-->
-<!--          <li><strong>Total Policies:</strong> {{ summary.totalPolicies }}</li>-->
-<!--          <li><strong>Top Policies:</strong></li>-->
-<!--          <ul>-->
-<!--            <li *ngFor="let policy of summary.topPolicies">-->
-<!--              {{ policy.name }}: {{ policy.count }}-->
-<!--            </li>-->
-<!--          </ul>-->
-<!--          <li><strong>Recent Purchases:</strong></li>-->
-<!--          <ul>-->
-<!--            <li *ngFor="let purchase of summary.recentPurchases">-->
-<!--              <strong>{{ purchase.id }}</strong> - {{ purchase.customer }} ({{ purchase.policy }} on {{ purchase.date }})-->
-<!--            </li>-->
-<!--          </ul>-->
-<!--        </ul>-->
-<!--      </div>-->
-<!--    </nx-card>-->
-<!--  </div>-->
-<!--</div>-->
-
-<!--@if (insuranceTypes$ | async as cards) {-->
-<!--  <nx-message context="success">-->
-<!--    <span class="nx-font-weight-bold">Notification title:</span><br />-->
-<!--    {{ successMessage }}-->
-<!--  </nx-message>-->
-<!--}-->
-
-<!--<div *ngIf="insuranceTypes$ | async as cards; else loading">-->
-<!--  <div *ngFor="let card of cards">-->
-<!--    <h3>{{ card.title }}</h3>-->
-<!--    <p>{{ card.description }}</p>-->
-<!--  </div>-->
-<!--</div>-->
-<!--<ng-template #loading>-->
-<!--  <p>Loading insurance types...</p>-->
-<!--</ng-template>-->
+  <div class="navbar">
+    <a class="title">Allianz i-EssentialCover</a>
+    <nx-link class="banner-buy-button" (click)="goToInitialForm()"
+    >Buy now</nx-link
+    >
+  </div>
 
 
+  <div class="section">
+    <div class="policy-banner-overlay">
+      <img src="../../../assets/images/views/person-wave.svg" alt="Allianz-Logo" class="overlay-img" />
+      <nx-link class="banner-policies" (click)="goToUserPolicies()">
+        {{ numOfPolicy }} <b> Allianz Life</b> Policies
+      </nx-link>
+    </div>
 
-@if (insuranceTypes$ | async) {
-  @for (header of dashboardCards; track header.title) {
-<!--    <nx-header-app-title [routerLink]="header.route">{{ header.title }}</nx-header-app-title>-->
-  }
-}
+    <br />
+    <br />
+    <br />
+    <h4>An online-exclusive product</h4>
+    <br />
+    <h1>Product info</h1>
+    <p>
+      Protect your family during difficult times with an affordable life
+      insurance plan. Ensure their needs are taken care of in the event of
+      death or total and permanent disability with Allianz i-EssentialCover.
+    </p>
+
+    <div class="features">
+      <div class="feature">
+        <img src="../../../assets/images/views/icon_capital.png" alt="Coverage Icon" />
+        <p>Coverage up to RM500,000</p>
+      </div>
+
+      <div class="feature">
+        <img
+          src="../../../assets/images/views/icon_thumbs-up.png"
+          alt="Guaranteed Premium Icon"
+        />
+        <p>Guaranteed yearly premium</p>
+      </div>
+
+      <div class="feature">
+        <img src="../../../assets/images/views/icon_benefit.png" alt="Fast Enrolment Icon" />
+        <p>Fast, hassle-free enrolment</p>
+      </div>
+    </div>
+
+    <a class="buy-button" (click)="goToInitialForm()">BUY NOW</a>
+  </div>
+</div>
+</body>

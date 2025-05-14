@@ -1,112 +1,116 @@
-<div nxLayout="grid" class="docs-grid-colored-grid">
-  <div nxRow>
-    <div nxCol="12" class="docs-grid-colored-col">
-      @if (successMessage) {
-        <nx-message context="success">
-          <span class="nx-font-weight-bold">Notification title:</span><br />
-          {{ successMessage }}
-        </nx-message>
+<nx-progress-stepper
+  [linear]="true"
+  [selectedIndex]="currentStep - 1"
+  currentStepLabel="Step"
+  [ngClass]="{ 'step-1-background': currentStep === 1 }">
+>
+  @for (item of mainSteps; track item; let i = $index) {
+    <nx-step [label]="formatCamelCase(item.path)">
+      <br>
+      @if (item.path === 'basic-information' && item.step === 1) {
+        <app-policy-purchase-initial-info
+          [nextStep]="nextStep.bind(this)"
+          [prevStep]="prevStep.bind(this)">
+        </app-policy-purchase-initial-info>
       }
-    </div>
-  </div>
 
-  <div nxRow>
-    <div nxCol="12" class="docs-grid-colored-col">
-      <nav aria-label="Breadcrumb">
-        <ol nxBreadcrumb appearance="link">
-          @for (item of breadcrumbItems; track item; let i = $index; let isLast = $last) {
-            <li>
-              <a nxBreadcrumbItem [routerLink]="isLast ? null : '/'">
-                {{ item }}
-              </a>
-            </li>
-          }
-        </ol>
-      </nav>
-    </div>
-  </div>
-
-  <div nxRow>
-    @for (type of insuranceTypes; track type.title) {
-      <div nxCol="4,12" class="docs-grid-colored-col">
-        <nx-card
-          clickable
-          class="nx-margin-2xs"
-          (click)="handleCardSelection(type)"
-        >
-          <h3 nxHeadline size="l">
-            <a nxCardMainLink [routerLink]="type.route">{{ type.title }}</a>
-          </h3>
-          <p>{{ type.description }}</p>
-          <nx-link size="small">
-            <a nxCardSecondaryInfo [routerLink]="type.route">Purchase {{ type.title }}</a>
-          </nx-link>
-        </nx-card>
-        </div>
+      @if (item.path === 'get-quote' && item.step === 2) {
+        <app-policy-purchase-plan
+          [nextStep]="nextStep.bind(this)"
+          [prevStep]="prevStep.bind(this)">
+        </app-policy-purchase-plan>
       }
-  </div>
-</div>
 
-<ng-template #templateRef>
-  <div class="centered-content">
-    <h3 nxHeadline="subsection-medium" class="nx-modal-margin-bottom">
-      Insurance Form
-    </h3>
-    <form [formGroup]="insuranceForm" (ngSubmit)="submitForm()">
-      <nx-formfield
-        label="Insurance Type"
-        appearance="outline"
-        floatLabel="always"
-      >
-        <nx-dropdown formControlName="insuredName">
-          @for (insurance of insuranceTypes; track insurance) {
-            <nx-dropdown-item [value]="insurance.title">{{ insurance.title }}</nx-dropdown-item>
+      @if (item.path === 'apply-now' && item.step === 3) {
+        @switch (currentSubStep) {
+          @case (1) {
+            <div class="particulars-container">
+              <nx-card style="width: 1200px">
+                <div nxLayout="list">
+                  <div nxRow>
+                    <div nxCol="12,12,12,6" class="docs-grid-colored-col">
+                      <h3 nxHeadline size="l" class="card-title">Allianz i-EssentialCover</h3>
+                      <p nxCardSecondaryInfo class="card-subtitle">
+                        Life Assured's Particulars
+                      </p>
+                    </div>
+                    <div nxCol="12,12,12,6" class="docs-grid-colored-col">
+                      <app-progressbar
+                        style="display: flex; justify-content: flex-end; margin-top: 2rem;"
+                        [currentPath]="currentSubStep"
+                        [totalPath]="subSteps.length">
+                      </app-progressbar>
+                    </div>
+                  </div>
+                </div>
+
+                <app-policy-purchase-insured-info
+                  [nextSubStep]="nextSubStep.bind(this)"
+                  [prevStep]="prevStep.bind(this)">
+                </app-policy-purchase-insured-info>
+              </nx-card>
+            </div>
           }
-        </nx-dropdown>
-      </nx-formfield>
 
-      <nx-formfield label="Coverage Amount" appearance="outline" floatLabel="always">
-        <span nxFormfieldPrefix>RM</span>
-        <input nxInput type="number" formControlName="coverageAmt" />
-        <button
-          nxFormfieldAppendix
-          nxIconButton="tertiary small"
-          nxPopoverDirection="top"
-          [nxPopoverTriggerFor]="popoverAppearance"
-          nxPopoverTrigger="click"
-          type="button"
-          aria-label="More information"
-        >
-          <nx-icon name="info-circle-o" size="s" aria-hidden="true"></nx-icon>
-        </button>
-      </nx-formfield>
+          @case (2) {
+            <div class="particulars-container">
+              <nx-card style="width: 1200px">
+                <div nxLayout="list">
+                  <div nxRow>
+                    <div nxCol="12,12,12,6" class="docs-grid-colored-col">
+                      <h3 nxHeadline size="l" class="card-title">Allianz i-EssentialCover</h3>
+                      <p nxCardSecondaryInfo class="card-subtitle">
+                        Life Assured's Particulars
+                      </p>
+                    </div>
+                    <div nxCol="12,12,12,6" class="docs-grid-colored-col">
+                      <app-progressbar
+                        style="display: flex; justify-content: flex-end; margin-top: 2rem;"
+                        [currentPath]="currentSubStep"
+                        [totalPath]="subSteps.length">
+                      </app-progressbar>
+                    </div>
+                  </div>
+                </div>
 
-      <div class="two-button-container">
-        <button
-          nxButton="primary small"
-          class="nx-margin-right-s"
-          type="submit"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
-  </div>
-</ng-template>
+                <app-policy-purchase-summary
+                  [nextSubStep]="nextSubStep.bind(this)"
+                  [prevSubStep]="prevSubStep.bind(this)"
+                  (paymentResult)="onPaymentResult($event)">
+                </app-policy-purchase-summary>
+              </nx-card>
+            </div>
+          }
 
-<nx-popover #popoverAppearance>
-  <div style="max-width: 300px">
-    <strong>General Insurance:</strong><br />
-    Covers non-life risks such as property damage, car accidents, and travel disruptions.<br />
-    <em>Minimum Coverage:</em> RM 10,000<br /><br />
+          @case (3) {
+            <div class="particulars-container">
+              <nx-card style="width: 1200px">
+                <div nxLayout="list">
+                  <div nxRow>
+                    <div nxCol="12,12,12,6" class="docs-grid-colored-col">
+                      <h3 nxHeadline size="l" class="card-title">Allianz i-EssentialCover</h3>
+                      <p nxCardSecondaryInfo class="card-subtitle">
+                        Life Assured's Particulars
+                      </p>
+                    </div>
+                    <div nxCol="12,12,12,6" class="docs-grid-colored-col">
+                      <app-progressbar
+                        style="display: flex; justify-content: flex-end; margin-top: 2rem;"
+                        [currentPath]="currentSubStep"
+                        [totalPath]="subSteps.length">
+                      </app-progressbar>
+                    </div>
+                  </div>
+                </div>
 
-    <strong>Individual Insurance:</strong><br />
-    Focuses on personal protection like health insurance, critical illness, and personal accidents.<br />
-    <em>Minimum Coverage:</em> RM 20,000<br /><br />
-
-    <strong>Life Insurance:</strong><br />
-    Provides long-term financial support to your family or beneficiaries in the event of death or disability.<br />
-    <em>Minimum Coverage:</em> RM 100,000
-  </div>
-</nx-popover>
-
+                <app-policy-purchase-receipt
+                  [paymentStatus]="paymentStatus">
+                </app-policy-purchase-receipt>
+              </nx-card>
+            </div>
+          }
+        }
+      }
+    </nx-step>
+  }
+</nx-progress-stepper>

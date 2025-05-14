@@ -1,6 +1,19 @@
-<app-header></app-header>
+<!--<app-header></app-header>-->
 <!--      <app-sidebar></app-sidebar>-->
-<router-outlet></router-outlet>
+<!--<router-outlet></router-outlet>-->
 <!--      <app-experience></app-experience>-->
-<app-footer></app-footer>
+<!--<app-footer></app-footer>-->
 <!-- Copyright 2025 Allianz -->
+
+<app-loading-spinner></app-loading-spinner>
+<div class="site-wrapper">
+  @if (showSiteHeader == true) {
+    <app-site-header [isLoggedIn]="isLoggedIn()"></app-site-header>
+  }
+  <div class="site-main" #siteMain>
+    <router-outlet></router-outlet>
+  </div>
+  @if (showSiteFooter === true) {
+    <app-site-footer id="siteFooter"></app-site-footer>
+  }
+</div>

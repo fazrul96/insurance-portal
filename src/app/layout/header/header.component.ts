@@ -11,7 +11,6 @@ import {
 } from '@aposin/ng-aquila/header';
 import {NxLinkComponent} from '@aposin/ng-aquila/link';
 import {AuthService} from '@auth0/auth0-angular';
-import {UserDetail} from '../../core/models/user-detail.model';
 import {NxBreakpoints, NxViewportService} from '@aposin/ng-aquila/utils';
 import {distinctUntilChanged, filter, map, merge, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
@@ -70,7 +69,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   protected readonly _destroyed = new Subject<void>();
 
-  userInfo: UserDetail | null = null;
+  userInfo = null;
   isAuthenticated: boolean = false;
   userFullName: string | undefined = '';
   lastLogin: Date = new Date();
@@ -139,13 +138,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   setUserInfo(user: any): void {
-    this.userInfo = {
-      fullName: user.name,
-      shortName: user.nickname,
-      email: user.email || '',
-      picture: user.picture,
-    };
-    this.userFullName = this.userInfo.fullName;
+    // this.userInfo = {
+    //   fullName: user.name,
+    //   shortName: user.nickname,
+    //   email: user.email || '',
+    //   picture: user.picture,
+    // };
+    // this.userFullName = this.userInfo.fullName;
+    this.userFullName = "user full name";
+    // todo recheck this part
   }
 
   get userInitials(): string {
