@@ -1,9 +1,18 @@
-import {AfterViewChecked, Component, ElementRef, HostListener, inject, Renderer2, ViewChild} from '@angular/core';
+import {
+  AfterViewChecked,
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  OnInit,
+  Renderer2,
+  ViewChild
+} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Store} from '@ngxs/store';
-import {UserLogin} from '../../store/user/user.action';
-import {UserLoginForm} from '../../core/models/user.model';
+import {UserLogin, UserLoginAuth0} from '../../store/user/user.action';
+import {UserAuth0, UserLoginForm} from '../../core/models/user.model';
 import {NxColComponent, NxLayoutComponent, NxRowComponent} from '@aposin/ng-aquila/grid';
 import {NxLinkComponent} from '@aposin/ng-aquila/link';
 import {NxMessageComponent} from '@aposin/ng-aquila/message';
@@ -11,6 +20,7 @@ import {NxFormfieldComponent} from '@aposin/ng-aquila/formfield';
 import {NxInputDirective, NxPasswordToggleComponent} from '@aposin/ng-aquila/input';
 import {NxButtonComponent} from '@aposin/ng-aquila/button';
 import {AuthService} from '@auth0/auth0-angular';
+import {filter, from, switchMap, take} from 'rxjs';
 
 @Component({
   selector: 'app-login-page',
@@ -30,7 +40,7 @@ import {AuthService} from '@auth0/auth0-angular';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent implements AfterViewChecked {
+export class LoginComponent implements AfterViewChecked, OnInit {
   @ViewChild('bannerCol', {read: ElementRef, static: false}) bannerCol!: ElementRef;
   viewportHeight: number = window.innerHeight;
   viewportWidth: number = window.innerWidth;
@@ -45,6 +55,32 @@ export class LoginComponent implements AfterViewChecked {
   private router: Router = inject(Router);
   private store: Store = inject(Store);
   private auth: AuthService = inject(AuthService);
+
+  ngOnInit(): void {
+    this.auth.isAuthenticated$.pipe(
+      filter(isAuthenticated => isAuthenticated),
+      take(1),
+      switchMap(() => this.auth.user$),
+      switchMap(user =>
+        from(this.auth.getAccessTokenSilently()).pipe(
+          switchMap(token => {
+            if (user && token) {
+
+              const userLoginPayload: UserAuth0 = {
+                email: user.email,
+                name: user.name,
+                platform: user.sub,
+                picture: user.picture,
+              }
+
+              this.store.dispatch(new UserLoginAuth0(userLoginPayload));
+            }
+            return [];
+          })
+        )
+      )
+    ).subscribe();
+  }
 
   ngAfterViewChecked(): void {
     this.updateBannerHeight();

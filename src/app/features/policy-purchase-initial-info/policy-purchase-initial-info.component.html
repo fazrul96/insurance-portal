@@ -15,9 +15,9 @@
             <nx-dropdown-item value="Male">Male</nx-dropdown-item>
             <nx-dropdown-item value="Female">Female</nx-dropdown-item>
           </nx-dropdown>
-            @if (submitted && infoForm.get('gender')?.hasError('required')) {
-              <nx-error>Gender is required.</nx-error>
-            }
+          @if (submitted && infoForm.get('gender')?.hasError('required')) {
+            <nx-error>Gender is required.</nx-error>
+          }
         </nx-formfield>
       </div>
 
@@ -36,9 +36,9 @@
             nxFormfieldSuffix
           />
           <nx-datepicker #myDatepicker></nx-datepicker>
-            @if(submitted && infoForm.get('birthDate')?.hasError('required')) {
+          @if(submitted && infoForm.get('birthDate')?.hasError('required')) {
             <nx-error nxFormfieldError> This field is required </nx-error>
-            }
+          }
         </nx-formfield>
       </div>
 

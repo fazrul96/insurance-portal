@@ -7,8 +7,8 @@ import {UserState} from '../../store/user/user.state';
 
 export const userAuthGuard: CanActivateFn = async (route, state) => {
   const auth = inject(AuthService);
-  const store = inject(Store);
-  const router = inject(Router);
+  const store: Store = inject(Store);
+  const router: Router = inject(Router);
 
   const isCustomLoggedIn = store.selectSnapshot(UserState.isLoggedIn);
   const isAuth0LoggedIn = await firstValueFrom(auth.isAuthenticated$);

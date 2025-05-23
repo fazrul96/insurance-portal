@@ -3,8 +3,8 @@ import { Router } from "@angular/router";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { map } from "rxjs";
 import { NxDialogService, NxModalRef } from "@aposin/ng-aquila/modal";
-import { UserLogin, UserLogout, UserRegistration } from "./user.action";
-import { USER_STATE_DEFAULT, UserStateModel } from "./user.state.model";
+import {UserLogin, UserLoginAuth0, UserLogout, UserRegistration} from "./user.action";
+import {USER_STATE_DEFAULT, UserStateAuth0Model, UserStateModel} from "./user.state.model";
 import {UserService} from '../../core/services/user.service';
 import {MessageModalData} from '../../core/models/message-modal-data.model';
 import {User} from '../../core/models/user.model';
@@ -43,9 +43,7 @@ export class UserState {
   }
 
   @Action(UserLogin)
-  userLogin({setState}: StateContext<UserStateModel>,
-    {payload}: UserLogin
-  ) {
+  userLogin({setState}: StateContext<UserStateModel>, {payload}: UserLogin) {
     return this.userService.userLogin(payload).pipe(
       map(res => {
         setState({
@@ -58,6 +56,18 @@ export class UserState {
         });
       })
     );
+  }
+
+  @Action(UserLoginAuth0)
+  userLoginAuth0(ctx: StateContext<UserStateAuth0Model>, { payload }: UserLoginAuth0) {
+    ctx.setState({
+      userDetails: {
+        name: payload.name,
+        email: payload.email,
+        platform: payload.platform,
+        picture: payload.picture
+      }
+    });
   }
 
   @Action(UserRegistration)

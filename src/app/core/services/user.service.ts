@@ -10,8 +10,8 @@ import {environment} from '../../../environments/environment';
   providedIn: 'root'
 })
 export class UserService {
-  private http = inject(HttpClient);
-  private apiUrl = environment.apiUrl;
+  private http: HttpClient = inject(HttpClient);
+  private apiUrl: string = environment.apiUrl;
 
   constructor() { }
 

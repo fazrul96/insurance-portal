@@ -17,11 +17,13 @@ import {NgClass} from '@angular/common';
 import {NxErrorComponent} from '@aposin/ng-aquila/base';
 import {NxRadioToggleButtonComponent, NxRadioToggleComponent} from '@aposin/ng-aquila/radio-toggle';
 import {NricPipe} from '../../shared/pipes/nric.pipe';
-import {PolicyService} from '../../core/services/policy.service';
 import {IdType} from '../../shared/enums/id-type.enum';
 import {nricValidator} from '../../shared/validators/nric.validator';
-import {HttpResponseBody} from '../../core/models/http-body.model';
 import {PolicyPersonalDetails} from '../../core/models/policy.model';
+import {NxDialogService, NxModalRef} from '@aposin/ng-aquila/modal';
+import {MessageModalData} from '../../core/models/message-modal-data.model';
+import {MessageModalComponent} from '../../shared/components/message-modal/message-modal.component';
+import {HttpErrorBody} from '../../core/models/http-body.model';
 
 @Component({
   selector: 'app-policy-purchase-insured-info',
@@ -57,8 +59,9 @@ export class PolicyPurchaseInsuredInfoComponent implements OnInit, OnDestroy {
 
   store: Store = inject(Store);
   formBuilder: FormBuilder = inject(FormBuilder);
-  policyService: PolicyService = inject(PolicyService);
   nricPipe: NricPipe = inject(NricPipe);
+  private dialogService = inject(NxDialogService);
+  private dialogRef?: NxModalRef<any>;
 
   personalDetailsForm!: FormGroup;
 
@@ -67,16 +70,16 @@ export class PolicyPurchaseInsuredInfoComponent implements OnInit, OnDestroy {
   usPersonError: boolean = false;
   emailError: boolean = false;
   idNoError: boolean = false;
-  submitted = false;
+  submitted: boolean = false;
 
-  readonly data = ['Male', 'Female'];
+  readonly gender = ['Male', 'Female'];
   FIELD_OPTIONS = {
     title: [
       { value: 'Mr', label: 'Mr' },
       { value: 'Mrs', label: 'Mrs' },
     ],
     nationality: [
-      { value: 'Malaysia', label: 'Malaysia' },
+      { value: 'Malaysia', label: 'Malaysian' },
     ],
     countryOfBirth: [
       { value: 'Malaysia', label: 'Malaysia' },
@@ -120,7 +123,7 @@ export class PolicyPurchaseInsuredInfoComponent implements OnInit, OnDestroy {
       countryOfBirth: new FormControl('', Validators.required),
       isSmoker: new FormControl(false),
       cigarettesPerDay: new FormControl(0),
-      countryCode: new FormControl(''),
+      countryCode: new FormControl('', Validators.required),
       mobileNo: new FormControl('', [
         Validators.required,
         Validators.maxLength(11),
@@ -169,15 +172,23 @@ export class PolicyPurchaseInsuredInfoComponent implements OnInit, OnDestroy {
   }
 
   handleSmokerToggle(): void {
+    const cigarettesControl = this.personalDetailsForm.get('cigarettesPerDay');
+    const isSmoker = this.personalDetailsForm.get('isSmoker')?.value;
+
+    if (!isSmoker) {
+      cigarettesControl?.disable();
+      cigarettesControl?.setValue(0);
+    }
+
     this.personalDetailsForm.get('isSmoker')?.valueChanges
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(isSmoker => {
-        const control = this.personalDetailsForm.get('cigarettesPerDay');
         if (isSmoker) {
-          control?.enable();
+          cigarettesControl?.enable();
+          cigarettesControl?.setValue(1);
         } else {
-          control?.disable();
-          control?.setValue(0);
+          cigarettesControl?.disable();
+          cigarettesControl?.setValue(0);
         }
       });
   }
@@ -221,20 +232,17 @@ export class PolicyPurchaseInsuredInfoComponent implements OnInit, OnDestroy {
     return this.store.selectSnapshot(PolicyPurchaseState.getAge);
   }
 
-  getTermsandConditions(): void {
-    this.policyService.getTermsAndConditions().subscribe({
-      next: (response: HttpResponseBody): void => {
-        const isSuccess: boolean = response?.code === 200 && response?.data;
-        if (isSuccess) {
-          const termsAndConditions = response?.data;
-          this.store.dispatch(new GetTermsAndConditions(termsAndConditions));
-          this.nextSubStep();
-        } else {
-          console.warn('⚠️ API responded with an unexpected status or missing data:', response?.message);
-        }
+  getTermsAndConditions(): void {
+    this.store.dispatch(new GetTermsAndConditions()).subscribe({
+      complete: () => {
+        this.nextSubStep();
       },
-      error: (error): void => {
-        console.error('❌ API call failed:', error);
+      error: (err: HttpErrorBody) => {
+        const messageData: MessageModalData = {
+          header: 'Error',
+          message: err.message ?? 'Unexpected error occurred.'
+        };
+        this.openErrorModal(messageData);
       }
     });
   }
@@ -242,14 +250,14 @@ export class PolicyPurchaseInsuredInfoComponent implements OnInit, OnDestroy {
   onSubmit(): void{
     this.submitted = true;
 
-    if (this.personalDetailsForm.invalid) {
+    if (this.personalDetailsForm.invalid || this.usPersonError) {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       console.log("Form is invalid, cannot proceed.");
       return;
     }
 
     this.submitForm();
-    this.getTermsandConditions();
+    this.getTermsAndConditions();
   }
 
   submitForm(): void {
@@ -263,6 +271,14 @@ export class PolicyPurchaseInsuredInfoComponent implements OnInit, OnDestroy {
 
   onBack(): void {
     this.prevStep();
+  }
+
+  private openErrorModal(messageData?: MessageModalData): void {
+    this.dialogRef = this.dialogService.open(MessageModalComponent, {
+      data: messageData,
+      disableClose: true,
+      ariaLabel: 'Error dialog'
+    })
   }
 
   ngOnInit(): void {

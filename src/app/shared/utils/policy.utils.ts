@@ -1,5 +1,4 @@
 import {PolicyStatus} from './enum-policy-status';
-import {Policy} from '../../core/models/policy.model';
 
 export function generatePolicyNumber(): string {
   const randomNumber = Math.floor(1000000 + Math.random() * 9000000);
@@ -19,16 +18,6 @@ export function checkPolicyStatus(coverageAmt: number): PolicyStatus {
 export function getCoverageAmount(): number {
   const amounts = [100000, 150000, 600000];
   return amounts[Math.floor(Math.random() * amounts.length)];
-}
-
-export function createPolicy(insuredName: string, coverageAmt: number): Policy {
-  return {
-    policyNumber: generatePolicyNumber(),
-    insuredName,
-    coverageAmt,
-    premium: calculatePremium(coverageAmt),
-    status: checkPolicyStatus(coverageAmt),
-  };
 }
 
 export function getPolicyStatusColor(status: PolicyStatus): string {

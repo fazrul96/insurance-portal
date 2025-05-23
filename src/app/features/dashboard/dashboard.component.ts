@@ -1,13 +1,16 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {NxColComponent, NxLayoutComponent, NxRowComponent,} from '@aposin/ng-aquila/grid';
 import {NxLinkComponent} from '@aposin/ng-aquila/link';
 import {Router} from '@angular/router';
 import {Store} from '@ngxs/store';
-import {PolicyProductDetails} from '../../store/policy-product/policy-product.action';
+import {LoadAllPolicies} from '../../store/policy-product/policy-product.action';
 import {PolicyProductState} from '../../store/policy-product/policy-product.state';
-import {UserState} from '../../store/user/user.state';
-import {PolicyProductService} from '../../core/services/policy-product.service';
 import {PolicyDetails} from '../../core/models/policy.model';
+import {NxDialogService, NxModalRef} from '@aposin/ng-aquila/modal';
+import {Subject} from 'rxjs';
+import {HttpErrorBody} from '../../core/models/http-body.model';
+import {MessageModalData} from '../../core/models/message-modal-data.model';
+import {MessageModalComponent} from '../../shared/components/message-modal/message-modal.component';
 
 @Component({
   selector: 'app-policy-product',
@@ -15,31 +18,54 @@ import {PolicyDetails} from '../../core/models/policy.model';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements OnInit {
-  private router = inject(Router);
-  private store = inject(Store);
-  private policyProductService =  inject(PolicyProductService);
-  numOfPolicy: number = 0;
+export class DashboardComponent implements OnInit, OnDestroy {
+  private router: Router = inject(Router);
+  private store: Store = inject(Store);
+  private dialogService = inject(NxDialogService);
 
-  ngOnInit() {
-    const user = this.store.selectSnapshot(UserState.getUser);
-    this.policyProductService.getAllPolicies(user).subscribe({
-      next: (response: any): void => {
-        this.store.dispatch(new PolicyProductDetails(response));
+  private unsubscribe$ = new Subject();
+
+  numOfPolicy: number = 0;
+  dialogRef?: NxModalRef<any>;
+
+  ngOnInit(): void {
+    this.store.dispatch(new LoadAllPolicies()).subscribe({
+      complete: () => {
         const policyProduct: PolicyDetails[] = this.store.selectSnapshot(PolicyProductState.getPolicyDetailsList);
         this.numOfPolicy = policyProduct.length;
       },
-      error: (error): void => {
-        console.error('❌ API call failed:', error);
+      error: (err: HttpErrorBody) => {
+        const messageData: MessageModalData = {
+          header: 'Error',
+          message: err.message ?? 'Unexpected error occurred.'
+        };
+        this.openErrorModal(messageData);
       }
     });
   }
 
-  goToUserPolicies() {
+  private openErrorModal(messageData?: MessageModalData): void {
+    this.dialogRef = this.dialogService.open(MessageModalComponent, {
+      data: messageData,
+      disableClose: true,
+      ariaLabel: 'Error dialog'
+    })
+  }
+
+  goToUserPolicies(): void {
     this.router.navigate(['policy-servicing']);
   }
 
-  goToInitialForm() {
+  goToInitialForm(): void {
     this.router.navigate(['policy-purchase']);
+  }
+
+  goToClaimList(): void {
+    this.router.navigate(['claim-management']);
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next('');
+    this.unsubscribe$.complete();
   }
 }

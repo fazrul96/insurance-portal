@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {NxColComponent, NxLayoutComponent, NxRowComponent} from '@aposin/ng-aquila/grid';
 import {CommonModule} from '@angular/common';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
@@ -8,14 +8,21 @@ import {NxCheckboxComponent} from '@aposin/ng-aquila/checkbox';
 import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NxButtonComponent} from '@aposin/ng-aquila/button';
 import {NxIconComponent} from '@aposin/ng-aquila/icon';
-import {NxDialogService, NxModalCloseDirective} from '@aposin/ng-aquila/modal';
+import {NxDialogService, NxModalCloseDirective, NxModalRef} from '@aposin/ng-aquila/modal';
 import {PolicyPurchaseState} from '../../store/policy/policy-purchase.state';
 import {UserState} from '../../store/user/user.state';
 import {QuotationSummaryComponent} from '../quotation-summary/quotation-summary.component';
 import {NxErrorComponent} from '@aposin/ng-aquila/base';
 import {PolicyService} from '../../core/services/policy.service';
 import {SUMMARY_FORM_LABELS, SUMMARY_FORM_ORDERS} from '../../shared/constants/form.costants';
-import {HttpResponseBody} from '../../core/models/http-body.model';
+import {Subject} from 'rxjs';
+import {PostPayment, PostPolicyApplication} from '../../store/policy/policy-purchase.action';
+import {HttpErrorBody} from '../../core/models/http-body.model';
+import {PolicyPlan} from '../../core/models/policy.model';
+import {User} from '../../core/models/user.model';
+import {convertToIsoDate} from '../../shared/utils/date-utils';
+import {MessageModalData} from '../../core/models/message-modal-data.model';
+import {MessageModalComponent} from '../../shared/components/message-modal/message-modal.component';
 
 type MyDialogResult = 'success' | 'failed';
 
@@ -41,7 +48,7 @@ type MyDialogResult = 'success' | 'failed';
   styleUrl: './policy-purchase-summary.component.scss'
 })
 
-export class PolicyPurchaseSummaryComponent implements OnInit {
+export class PolicyPurchaseSummaryComponent implements OnInit, OnDestroy {
   policyService: PolicyService = inject(PolicyService);
 
   quotationId: number = 0;
@@ -51,6 +58,9 @@ export class PolicyPurchaseSummaryComponent implements OnInit {
   finalConfirmation: FormControl<boolean | null> | undefined;
   termsAndConditions: any[] = [];
   displayPersonalInfo: any[] = [];
+  quotationDetails: any = [];
+  private unsubscribe$ = new Subject();
+  dialogRef?: NxModalRef<any>;
 
   form: FormGroup;
   formArray: FormArray;
@@ -82,8 +92,7 @@ export class PolicyPurchaseSummaryComponent implements OnInit {
       terms: this.fb.array([]),
     });
     this.formArray = this.form.get('terms') as FormArray;
-
-   }
+  }
 
   preparePersonalInfo(): void {
     // todo revamp more
@@ -120,7 +129,6 @@ export class PolicyPurchaseSummaryComponent implements OnInit {
         (item): item is { label: string; content: string } => item !== null
       );
   }
-
 
   private formatBooleanValue(value: any): string {
     if (value === null || value === undefined) return '—';
@@ -205,32 +213,32 @@ export class PolicyPurchaseSummaryComponent implements OnInit {
 
     const payload = this.buildApplicationPayload();
 
-    this.policyService.createPolicyApplication(payload).subscribe({
-      next: (response: any): void => {
-        // todo BE structure not meet HttpResponseBody requirement
-        this.quotationId = response?.id;
-        this.premiumMode = response?.planResponseDto?.premiumMode;
-        this.duration = this.modeToDurationMap[this.premiumMode];
+    this.store.dispatch(new PostPolicyApplication(payload)).subscribe({
+      next: (): void => {
+        this.quotationDetails = this.store.selectSnapshot(PolicyPurchaseState.getQuotationDetails);
         this.openModal();
       },
-      error: (error): void => {
-        console.error('❌ API call failed:', error);
+      error: (err: HttpErrorBody): void => {
+        this.openErrorModal({
+          header: 'Error',
+          message: err.message ?? 'Unexpected error occurred.'
+        });
       }
     });
   }
 
   buildApplicationPayload() {
     const personalDetails = this.store.selectSnapshot(PolicyPurchaseState.getPersonalDetails);
-    const plan = this.store.selectSnapshot(PolicyPurchaseState.selectedPlan);
-    const referenceNumber = this.store.selectSnapshot(PolicyPurchaseState.getReferenceNumber);
-    const user = this.store.selectSnapshot(UserState.getUser);
+    const plan: PolicyPlan | undefined = this.store.selectSnapshot(PolicyPurchaseState.selectedPlan);
+    const referenceNumber: string = this.store.selectSnapshot(PolicyPurchaseState.getReferenceNumber);
+    const user: User = this.store.selectSnapshot(UserState.getUser);
 
     return {
       personDto: {
         userId: user.userId,
         ...personalDetails,
         identificationNo: personalDetails?.idNo,
-        dateOfBirth: this.convertToIsoDate(personalDetails?.dateOfBirth),
+        dateOfBirth: convertToIsoDate(personalDetails?.dateOfBirth),
         phoneNo: personalDetails?.mobileNo,
         cigarettesNo: personalDetails?.cigarettesPerDay,
         purposeOfTransaction: personalDetails?.transactionPurpose,
@@ -240,15 +248,6 @@ export class PolicyPurchaseSummaryComponent implements OnInit {
         referenceNumber,
       },
     };
-  }
-
-  convertToIsoDate(dateStr?: string): string | null {
-    if (!dateStr) return null;
-
-    const [day, month, year] = dateStr.split('/');
-    const isoDate = new Date(`${year}-${month}-${day}T00:00:00Z`);
-
-    return isNaN(isoDate.getTime()) ? null : isoDate.toISOString();
   }
 
   openModal(): void{
@@ -267,22 +266,16 @@ export class PolicyPurchaseSummaryComponent implements OnInit {
     const selectedPlan = this.store.selectSnapshot(PolicyPurchaseState.selectedPlan);
 
     const payload = {
-      quotationId: this.quotationId,
+      quotationId: this.quotationDetails.quotationId,
       paymentAmount: selectedPlan?.premiumAmount,
-      duration: this.duration,
+      duration: this.modeToDurationMap[this.quotationDetails.premiumMode],
       paymentStatus: result.toUpperCase(),
       planInfo: selectedPlan,
     };
-
-    this.policyService.initiatePayment(payload).subscribe({
-      next: (response: HttpResponseBody) => {
-        console.log('💰 Payment initiated:', response);
-      },
-      error: (error) => console.error('❌ Payment failed:', error),
-    });
+    this.store.dispatch(new PostPayment(payload));
   }
 
-  handlePayment(result: 'success' | 'failed') {
+  handlePayment(result: 'success' | 'failed'): void {
     this.paymentStatus = result === 'success' ? 1 : 0;
     this.paymentResult.emit(this.paymentStatus);
     this.nextSubStep();
@@ -292,8 +285,21 @@ export class PolicyPurchaseSummaryComponent implements OnInit {
     this.prevSubStep();
   }
 
+  private openErrorModal(messageData?: MessageModalData): void {
+    this.dialogRef = this.dialogService.open(MessageModalComponent, {
+      data: messageData,
+      disableClose: true,
+      ariaLabel: 'Error dialog'
+    })
+  }
+
   ngOnInit(): void {
     this.loadTermsAndConditions();
     this.preparePersonalInfo();
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next('');
+    this.unsubscribe$.complete();
   }
 }

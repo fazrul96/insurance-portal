@@ -1,13 +1,13 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
-import { Regex } from "../enums/regex.enum";
-import { DatePipe } from "@angular/common";
+import {AbstractControl, ValidationErrors, ValidatorFn} from "@angular/forms";
+import {Regex} from "../enums/regex.enum";
+import {DatePipe} from "@angular/common";
 
 export function nricValidator(): ValidatorFn {
   return (control: AbstractControl<string>): ValidationErrors | null => {
     const value = control.value;
     const nricRegex = new RegExp(Regex.Nric);
     const datePipe = new DatePipe('en-US');
-    
+
     if (!value)
       return null;
 
@@ -21,7 +21,7 @@ export function nricValidator(): ValidatorFn {
         date.setFullYear(parseInt('20' + value.substring(0, 2)));
         const formattedDate: string | null = datePipe.transform(date, 'yy-MM-dd');
         const isValidDate: boolean = formattedDate === dateString;
-        
+
         const isValidNric = isNricRegex && isValidDate;
         return !isValidNric ? {invalidNric: true} : null;
       } catch (error) {

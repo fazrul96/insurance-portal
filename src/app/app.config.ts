@@ -17,6 +17,7 @@ import {UserState} from './store/user/user.state';
 import {PolicyPurchaseState} from './store/policy/policy-purchase.state';
 import {PolicyProductState} from './store/policy-product/policy-product.state';
 import {userAuthInterceptor} from './core/interceptors/user-auth.interceptor';
+import {PolicyClaimState} from './store/policy-claim/policy-claim.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -41,7 +42,7 @@ export const appConfig: ApplicationConfig = {
       }
     }),
     provideStore(
-      [UserState, PolicyPurchaseState, PolicyProductState],
+      [UserState, PolicyPurchaseState, PolicyProductState, PolicyClaimState],
       withNgxsStoragePlugin({
         keys: '*',
         storage: 1,

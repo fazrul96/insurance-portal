@@ -7,6 +7,13 @@ export interface User {
   userId: string
 }
 
+export interface UserAuth0 {
+  email?: string,
+  name?: string,
+  platform?: string
+  picture?: string;
+}
+
 export interface UserLoginForm {
   email: string,
   password: string
@@ -21,11 +28,4 @@ export interface UserRegistrationForm {
   mobileNoPrefix: MobilePrefix,
   mobileNo: string,
   role: string
-}
-
-export interface UserDetail {
-  fullName?: string;
-  shortName?: string;
-  email: string;
-  picture?: string;
 }

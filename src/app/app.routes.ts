@@ -10,7 +10,7 @@ export const ROUTE_PATHS = {
   dashboard: 'dashboard',
   policyPurchase: 'policy-purchase',
   policyServicing: 'policy-servicing',
-  policyDetails: 'policy-details',
+  policyServicingDetails: 'policy-servicing-details/:policyNo',
   claimManagement: 'claim-management',
 };
 
@@ -34,7 +34,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/policy-servicing/policy-servicing.component').then(m => m.PolicyServicingComponent),
     canActivate: [userAuthGuard]
   },
-  { path: 'policy-servicing-details/:id',
+  { path: ROUTE_PATHS.policyServicingDetails,
     loadComponent: () => import('./features/policy-servicing-details/policy-servicing-details.component').then(m => m.PolicyServicingDetailsComponent),
     canActivate: [userAuthGuard]
   },

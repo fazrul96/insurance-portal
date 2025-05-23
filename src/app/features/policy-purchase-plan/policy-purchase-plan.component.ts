@@ -9,7 +9,8 @@ import {PolicyPurchaseState} from '../../store/policy/policy-purchase.state';
 import {SelectPlan} from '../../store/policy/policy-purchase.action';
 import {CommonModule} from '@angular/common';
 import {NxButtonComponent} from '@aposin/ng-aquila/button';
-import {PolicyPlan, PolicyPlanDto} from '../../core/models/policy.model';
+import {PolicyDetails, PolicyPlan, PolicyPlanDto} from '../../core/models/policy.model';
+import {QuotationSummaryComponent} from '../quotation-summary/quotation-summary.component';
 
 @Component({
   selector: 'app-policy-purchase-plan',
@@ -22,7 +23,8 @@ import {PolicyPlan, PolicyPlanDto} from '../../core/models/policy.model';
     ReactiveFormsModule,
     CommonModule,
     NxButtonComponent,
-    NxButtonComponent
+    NxButtonComponent,
+    QuotationSummaryComponent
   ],
   templateUrl: './policy-purchase-plan.component.html',
   styleUrl: './policy-purchase-plan.component.scss',
@@ -33,11 +35,11 @@ export class PolicyPurchasePlanComponent implements OnInit {
   @Input() nextStep!: () => void;
   @Input() prevStep!: () => void;
 
+  quotationDetails$!: Observable<PolicyDetails>;
   plans$: Observable<PolicyPlanDto[]> | undefined;
   selectedPlan$: Observable<PolicyPlan | undefined> | undefined;
 
   infoForm!: FormGroup;
-  selectedPlan: any;
   latestPlan!: PolicyPlan | undefined;
 
   constructor(private fb: FormBuilder, private store: Store) {}
@@ -50,50 +52,67 @@ export class PolicyPurchasePlanComponent implements OnInit {
 
     this.plans$ = this.store.select(PolicyPurchaseState.plans);
     this.selectedPlan$ = this.store.select(PolicyPurchaseState.selectedPlan);
-
     this.selectedPlan$.subscribe(plan => {
+      console.log('Selected plan from state:', plan)
       this.latestPlan = plan;
-    })
+      if (plan) {
+        this.infoForm.patchValue({ planSelection: plan.planName });
+      }
+    });
+
+    this.quotationDetails$ = this.store.select(PolicyPurchaseState.getQuotationDetails);
   }
 
-  onPaymentPeriodChange(newPeriod: string) {
+  onPlanSelect(plan: PolicyPlanDto) {
+    const paymentPeriod = this.infoForm.value.paymentPeriod;
+
+    const selectedPlan: PolicyPlan = {
+      id: plan.id,
+      planName: plan.planName,
+      sumAssured: plan.sumAssured,
+      coverageTerm: plan.coverageTerm,
+      premiumAmount: paymentPeriod === 'monthly' ? plan.monthlyPremium : plan.yearlyPremium,
+      premiumMode: paymentPeriod === 'monthly' ? 'MONTHLY' : 'YEARLY',
+    }
+
+    this.infoForm.patchValue({ planSelection: plan.planName });
+    this.store.dispatch(new SelectPlan(selectedPlan));
+
+  }
+
+  onPaymentPeriodChange(newPeriod: string): void {
     this.infoForm.patchValue({ paymentPeriod: newPeriod })
+
+    const selectedPlanName = this.infoForm.value.planSelection;
+
+    if (selectedPlanName && this.plans$) {
+      this.plans$.pipe(take(1)).subscribe(plans => {
+        const matchedPlan = plans.find(p => p.planName === selectedPlanName);
+        if (!matchedPlan) return;
+
+        const updatedSelectedPlan: PolicyPlan = {
+          id: matchedPlan.id,
+          planName: matchedPlan.planName,
+          sumAssured: matchedPlan.sumAssured,
+          coverageTerm: matchedPlan.coverageTerm,
+          premiumAmount: newPeriod === 'monthly' ? matchedPlan.monthlyPremium : matchedPlan.yearlyPremium,
+          premiumMode: newPeriod === 'monthly' ? 'MONTHLY' : 'YEARLY',
+        };
+
+        this.store.dispatch(new SelectPlan(updatedSelectedPlan));
+      });
+    }
   }
 
   onBack(): void {
-    console.log('Back button clicked');
     this.prevStep();
   }
 
   onNext(): void {
-    this.nextStep();
+
     if (!this.infoForm.value.planSelection){
-      console.warn("No plan selected");
       return;
     }
-    console.log("Proceeding with plan: ", this.infoForm.value.planSelection);
-
-    const selectedPlanName = this.infoForm.value.planSelection;
-    const paymentPeriod  = this.infoForm.value.paymentPeriod;
-
-    this.plans$?.pipe(take(1)).subscribe(plans => {
-      const matchedPlan = plans.find(plan => plan.planName === selectedPlanName);
-      if (!matchedPlan) {
-        console.warn('Selected plan not found')
-        return;
-      }
-
-      const selectedPlan: PolicyPlan = {
-        id: matchedPlan.id,
-        planName: matchedPlan.planName,
-        sumAssured: matchedPlan.sumAssured,
-        coverageTerm: matchedPlan.coverageTerm,
-        premiumAmount: paymentPeriod === 'monthly' ? matchedPlan.monthlyPremium : matchedPlan.yearlyPremium,
-        premiumMode: paymentPeriod === 'monthly' ? "MONTHLY" : "YEARLY",
-      };
-
-      this.store.dispatch(new SelectPlan(selectedPlan));
-      console.log('Dispatch selected plan', selectedPlan);
-    })
+    this.nextStep();
   }
 }

@@ -1,9 +1,10 @@
 import {CommonModule} from '@angular/common';
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, Input, OnChanges, OnInit} from '@angular/core';
 import {PolicyPurchaseState} from '../../store/policy/policy-purchase.state';
 import {Store} from '@ngxs/store';
 import {NxTableCellComponent, NxTableComponent, NxTableRowComponent} from '@aposin/ng-aquila/table';
 import {PolicyDetails} from '../../core/models/policy.model';
+import {formatCamelCase, formatPremium} from '../../shared/utils/string-utils';
 
 @Component({
   selector: 'app-quotation-summary',
@@ -11,41 +12,35 @@ import {PolicyDetails} from '../../core/models/policy.model';
   templateUrl: './quotation-summary.component.html',
   styleUrl: './quotation-summary.component.scss'
 })
-export class QuotationSummaryComponent implements OnInit {
+export class QuotationSummaryComponent implements OnInit, OnChanges {
+  @Input() quotation: PolicyDetails | null = null;
+  @Input() paymentMode: string = '';
+
   store: Store = inject(Store);
   quotationSummary: Array<{ title: string; desc: string }> = [];
 
-  formatPremium(amount?: number, mode: string = ''): string {
-    if (!amount) return '—';
-    const normalizedMode = mode.toLowerCase();
-    return `RM ${amount} / ${normalizedMode}`;
-  }
-
-  formatCamelCase(path: string): string {
-    return path
-      .split('-')
-      .map((word) => {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      })
-      .join(' ');
-  }
-
   ngOnInit(): void {
-    const quotation: PolicyDetails = this.store.selectSnapshot(PolicyPurchaseState.getQuotationDetails);
+    if (!this.quotation) {
+      this.quotation = this.store.selectSnapshot(PolicyPurchaseState.getQuotationDetails);
+      this.ngOnChanges();
+    }
+  }
 
-    if (!quotation) return;
-    const mode:string = quotation.plan?.premiumMode ?? '';
+  ngOnChanges(): void {
+    if (!this.quotation) return;
+
+    const mode = this.quotation.plan?.premiumMode ?? this.paymentMode;
 
     this.quotationSummary = [
       {title: 'Plan Information Summary', desc: ''},
-      {title: 'Reference Number', desc: quotation.quotationNumber ?? '—'},
-      {title: 'Gender', desc: quotation.personalDetails?.gender ?? '—'},
-      {title: 'Date of Birth', desc: quotation.personalDetails?.dateOfBirth ?? '—'},
-      {title: 'Age Nearest Birthday', desc: quotation.personalDetails?.age?.toString() ?? '—'},
-      {title: 'Selected Plan', desc: quotation.plan?.planName ?? '—'},
-      {title: 'Premium Mode', desc: this.formatCamelCase(mode) ?? '—'},
-      {title: 'Coverage Term', desc: quotation.plan?.coverageTerm ?? '—'},
-      {title: 'Premium Payable', desc: this.formatPremium(quotation.plan?.premiumAmount, mode)},
+      {title: 'Reference Number', desc: this.quotation.quotationNumber ?? '—'},
+      {title: 'Gender', desc: this.quotation.personalDetails?.gender ?? '—'},
+      {title: 'Date of Birth', desc: this.quotation.personalDetails?.dateOfBirth ?? '—'},
+      {title: 'Age Nearest Birthday', desc: this.quotation.personalDetails?.age?.toString() ?? '—'},
+      {title: 'Selected Plan', desc: this.quotation.plan?.planName ?? '—'},
+      {title: 'Premium Mode', desc: formatCamelCase(mode) ?? '—'},
+      {title: 'Coverage Term', desc: this.quotation.plan?.coverageTerm ?? '—'},
+      {title: 'Premium Payable', desc: formatPremium(this.quotation.plan?.premiumAmount, mode)},
     ];
   }
 }

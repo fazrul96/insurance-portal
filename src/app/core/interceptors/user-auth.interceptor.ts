@@ -12,7 +12,6 @@ export const userAuthInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
   const store = inject(Store);
 
-
   const shouldSkipHeaders = request.context.get(SkipUserAuthHeaders);
   if (shouldSkipHeaders) {
     return next(request);
@@ -24,11 +23,16 @@ export const userAuthInterceptor: HttpInterceptorFn = (request, next) => {
     const jwtToken: string = store.selectSnapshot(UserState.getJwtToken);
     const currentUser: User = store.selectSnapshot(UserState.getUser);
 
-    const customHeaders = new HttpHeaders({
-      'Content-Type': 'application/json',
+    const isFormData: boolean = request.body instanceof FormData;
+
+    let customHeaders: HttpHeaders = new HttpHeaders({
       'Authorization': `Bearer ${jwtToken}`,
       'userId': currentUser.userId
     });
+
+    if (!isFormData) {
+      customHeaders = customHeaders.set('Content-Type', 'application/json');
+    }
 
     return next(request.clone({ headers: customHeaders }));
   }
