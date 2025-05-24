@@ -1,10 +1,26 @@
-<table nxTable class="info_table">
-  <tbody>
-    @for (item of quotationSummary; track $index) {
-      <tr nxTableRow [class.premium-row]="item.title === 'Premium Payable'">
-        <td nxTableCell>{{ item.title }}</td>
-        <td nxTableCell>{{ item.desc }}</td>
-      </tr>
-    }
-  </tbody>
-</table>
+<nx-card class="quotation-card">
+  <div class="quotation-header">
+    <span class="quotation-title">Allianz i-EssentialCover</span>
+    <span class="quotation-subtitle">Quotation Summary</span>
+  </div>
+
+  @for (item of quotationSummaryRows; track $index) {
+    <div class="summary-row">
+      <span class="summary-title">{{ item.title }}</span>
+      <span class="summary-desc">{{ item.desc }}</span>
+    </div>
+  }
+
+  @if (premiumSummary) {
+    <div class="premium-section">
+      <div class="premium-label">{{ premiumSummary.title }}</div>
+      <div class="premium-value">{{ premiumSummary.desc }}</div>
+    </div>
+  }
+
+  <div class="premium-section">
+    <div class="summary-actions">
+      <ng-content select="[summary-actions]"></ng-content>
+    </div>
+  </div>
+</nx-card>

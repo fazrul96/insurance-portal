@@ -12,7 +12,6 @@ import {NxDialogService, NxModalCloseDirective, NxModalRef} from '@aposin/ng-aqu
 import {PolicyPurchaseState} from '../../store/policy/policy-purchase.state';
 import {UserState} from '../../store/user/user.state';
 import {QuotationSummaryComponent} from '../quotation-summary/quotation-summary.component';
-import {NxErrorComponent} from '@aposin/ng-aquila/base';
 import {PolicyService} from '../../core/services/policy.service';
 import {SUMMARY_FORM_LABELS, SUMMARY_FORM_ORDERS} from '../../shared/constants/form.costants';
 import {Subject} from 'rxjs';
@@ -23,6 +22,7 @@ import {User} from '../../core/models/user.model';
 import {convertToIsoDate} from '../../shared/utils/date-utils';
 import {MessageModalData} from '../../core/models/message-modal-data.model';
 import {MessageModalComponent} from '../../shared/components/message-modal/message-modal.component';
+import {NxMessageComponent} from '@aposin/ng-aquila/message';
 
 type MyDialogResult = 'success' | 'failed';
 
@@ -42,7 +42,7 @@ type MyDialogResult = 'success' | 'failed';
     NxIconComponent,
     NxModalCloseDirective,
     QuotationSummaryComponent,
-    NxErrorComponent
+    NxMessageComponent
   ],
   templateUrl: './policy-purchase-summary.component.html',
   styleUrl: './policy-purchase-summary.component.scss'

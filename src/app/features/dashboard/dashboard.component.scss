@@ -143,7 +143,6 @@ body {
   border-radius: 4px;
   border-color: #00527a;
   cursor: pointer;
-
 }
 
 .banner-policies > div {
@@ -151,9 +150,19 @@ body {
   align-items: center;
   padding: 0 30px;
 }
+
 .policy-banner-overlay {
   position: relative;
   display: inline-block;
+  box-shadow: 0 2px 8px rgb(124, 123, 123);
+  animation: fadeIn 0.8s ease-in-out;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: scale(1.04);
+    box-shadow: 0 4px 18px rgb(73, 151, 182);
+    cursor: pointer;
+  }
 }
 
 .policy-banner-overlay > .banner-policies{
@@ -164,7 +173,7 @@ body {
 
 .divider{
   border-top:1px solid #00527a;
-  height: 40px
+  height: 40px;
 }
 
 .overlay-img {
@@ -175,3 +184,13 @@ body {
   z-index: 2;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

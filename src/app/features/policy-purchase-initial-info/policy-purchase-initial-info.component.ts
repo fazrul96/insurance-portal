@@ -1,5 +1,5 @@
 import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators,} from '@angular/forms';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators,} from '@angular/forms';
 import {NxButtonComponent} from '@aposin/ng-aquila/button';
 import {NxDropdownComponent, NxDropdownItemComponent,} from '@aposin/ng-aquila/dropdown';
 import {NxFormfieldComponent, NxFormfieldModule, NxFormfieldSuffixDirective,} from '@aposin/ng-aquila/formfield';
@@ -16,12 +16,15 @@ import {Router, RouterModule} from '@angular/router';
 import {Store} from '@ngxs/store';
 import {PostQuotationPlans} from '../../store/policy/policy-purchase.action';
 import {PolicyPurchaseState} from '../../store/policy/policy-purchase.state';
-import {Subject, take} from 'rxjs';
+import {Subject, takeUntil} from 'rxjs';
 import {HttpErrorBody} from '../../core/models/http-body.model';
-import {NxRowComponent} from '@aposin/ng-aquila/grid';
+import {NxColComponent, NxLayoutComponent, NxRowComponent} from '@aposin/ng-aquila/grid';
 import {NxDialogService, NxModalRef} from '@aposin/ng-aquila/modal';
 import {MessageModalData} from '../../core/models/message-modal-data.model';
 import {MessageModalComponent} from '../../shared/components/message-modal/message-modal.component';
+import {NxIconComponent} from '@aposin/ng-aquila/icon';
+import {NgClass} from '@angular/common';
+import {formatBirthdate} from '../../shared/utils/date-utils';
 
 @Component({
   selector: 'app-policy-purchase-initial-info',
@@ -44,8 +47,11 @@ import {MessageModalComponent} from '../../shared/components/message-modal/messa
     NxNativeDateModule,
     NxDatepickerComponent,
     RouterModule,
+    NxLayoutComponent,
     NxRowComponent,
-
+    NxColComponent,
+    NxIconComponent,
+    NgClass,
   ],
   templateUrl: './policy-purchase-initial-info.component.html',
   styleUrl: './policy-purchase-initial-info.component.scss',
@@ -53,26 +59,23 @@ import {MessageModalComponent} from '../../shared/components/message-modal/messa
 export class PolicyPurchaseInitialInfoComponent implements OnInit, OnDestroy {
   @Input() nextStep!: () => void;
   @Input() prevStep!: () => void;
+
+  private store: Store = inject(Store);
+  private router: Router = inject(Router);
   private dialogService = inject(NxDialogService);
   private dialogRef?: NxModalRef<any>;
   unsubscribe$ = new Subject();
 
   infoForm!: FormGroup;
-
   submitted: boolean = false;
 
   today: Date = new Date();
   minAge: number = 18;
   maxAge: number = 65;
-
   maxDate: Date;
   minDate: Date;
 
-  constructor(
-    private fb: FormBuilder,
-    private store: Store,
-    private router: Router,
-  ) {
+  constructor() {
     this.maxDate = new Date();
     this.maxDate.setFullYear(this.today.getFullYear() - this.minAge);
 
@@ -80,69 +83,23 @@ export class PolicyPurchaseInitialInfoComponent implements OnInit, OnDestroy {
     this.minDate.setFullYear(this.today.getFullYear() - this.maxAge);
   }
 
-  ngOnInit(): void {
-    this.infoForm = this.fb.group({
-      gender: new FormControl('', Validators.required),
-      birthDate: new FormControl('', [
-        Validators.required,
-        this.birthdateValidator(this.minDate, this.maxDate),
-      ]),
-    });
-
-    this.store
-      .select(PolicyPurchaseState.getGender)
-      .pipe(take(1))
-      .subscribe((gender) => {
-        this.infoForm.get('gender')?.setValue(gender);
-      });
-
-    this.store
-      .select(PolicyPurchaseState.getDateOfBirth)
-      .pipe(take(1))
-      .subscribe((dobString) => {
-        if (dobString) {
-          const [day, month, year] = dobString.split('/');
-          const dateObj = new Date(+year, +month - 1, +day);
-          this.infoForm.get('birthDate')?.setValue(dateObj);
-        }
-      });
-  }
-
-  parseDateFromString(dateStr: string): Date | null {
-    const parts = dateStr.split('/');
-    if (parts.length === 3) {
-      const month = parseInt(parts[0], 10) - 1;
-      const day = parseInt(parts[1], 10);
-      const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    }
-    return null;
-  }
-
-  onBack(): void {
-    this.router.navigate(['/policy-product']);
-  }
-
   onNext(): void {
     this.submitted = true;
 
-    if (!this.infoForm.valid) {
+    if (this.infoForm.invalid) {
       this.infoForm.markAllAsTouched();
-      console.warn('⚠️ Form is invalid');
       return;
     }
 
-    const formValues = this.infoForm.value;
+    const { gender, birthDate } = this.infoForm.value;
 
     const payload = {
-      gender: formValues.gender.toUpperCase(),
-      dateOfBirth: this.formatDate(formValues.birthDate)
+      gender: gender.toUpperCase(),
+      dateOfBirth: formatBirthdate(birthDate)
     };
 
     this.store.dispatch(new PostQuotationPlans(payload)).subscribe({
-      complete: () => {
-        this.nextStep();
-      },
+      next: () => {this.nextStep();},
       error: (err: HttpErrorBody) => {
         const messageData: MessageModalData = {
           header: 'Error',
@@ -153,15 +110,11 @@ export class PolicyPurchaseInitialInfoComponent implements OnInit, OnDestroy {
     });
   }
 
-  formatDate(date: Date): string {
-    // Format as "dd/MM/yyyy"
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+  onBack(): void {
+    this.router.navigate(['/dashboard']);
   }
 
-  birthdateValidator(min: Date, max: Date) {
+  private dateRangeValidator(min: Date, max: Date) {
     return (control: any) => {
       const value = new Date(control.value);
       if (isNaN(value.getTime())) return { invalidDate: true };
@@ -176,6 +129,36 @@ export class PolicyPurchaseInitialInfoComponent implements OnInit, OnDestroy {
       disableClose: true,
       ariaLabel: 'Error dialog'
     })
+  }
+
+  private initializeForm(): void {
+    this.infoForm = new FormGroup({
+      gender: new FormControl('', Validators.required),
+      birthDate: new FormControl('', [
+        Validators.required,
+        this.dateRangeValidator(this.minDate, this.maxDate),
+      ])
+    });
+  }
+
+  private loadInitialData(): void {
+    this.store.select(PolicyPurchaseState.getGender)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(gender => this.infoForm.get('gender')?.setValue(gender));
+
+    this.store.select(PolicyPurchaseState.getDateOfBirth)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(dobString => {
+        if (dobString) {
+          const [day, month, year] = dobString.split('/');
+          this.infoForm.get('birthDate')?.setValue(new Date(+year, +month - 1, +day));
+        }
+      });
+  }
+
+  ngOnInit(): void {
+    this.initializeForm();
+    this.loadInitialData();
   }
 
   ngOnDestroy(): void {

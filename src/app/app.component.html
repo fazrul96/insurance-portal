@@ -2,9 +2,8 @@
 <div class="site-wrapper">
   @if (showSiteHeader) {
     <app-site-header [isLoggedIn]="isLoggedIn()"></app-site-header>
+<!--    <app-header></app-header>-->
   }
-  <!--      <app-sidebar></app-sidebar>-->
-  <!--      <app-experience></app-experience>-->
   <div class="site-main" #siteMain>
     <router-outlet></router-outlet>
   </div>

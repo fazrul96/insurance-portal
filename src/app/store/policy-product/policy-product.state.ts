@@ -120,22 +120,6 @@ export class PolicyProductState {
         }
       })
     );
-    // const updatedPolicies = state.policyList.map(policy =>
-    //   policy.quotationNumber === policyNo
-    //     ? {
-    //         ...policy,
-    //         personalDetails: {
-    //           ...policy.personalDetails,
-    //           ...updatedInfo
-    //         }
-    //       }
-    //     : policy
-    // );
-
-    // ctx.patchState({
-    //   ...state,
-    //   policyList: updatedPolicies
-    // });
   }
 }
 

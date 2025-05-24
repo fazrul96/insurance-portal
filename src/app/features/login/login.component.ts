@@ -11,8 +11,8 @@ import {
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Store} from '@ngxs/store';
-import {UserLogin, UserLoginAuth0} from '../../store/user/user.action';
-import {UserAuth0, UserLoginForm} from '../../core/models/user.model';
+import {UserLogin, UserLoginAuth0, UserRegistration} from '../../store/user/user.action';
+import {UserAuth0, UserLoginForm, UserRegistrationForm} from '../../core/models/user.model';
 import {NxColComponent, NxLayoutComponent, NxRowComponent} from '@aposin/ng-aquila/grid';
 import {NxLinkComponent} from '@aposin/ng-aquila/link';
 import {NxMessageComponent} from '@aposin/ng-aquila/message';
@@ -20,7 +20,10 @@ import {NxFormfieldComponent} from '@aposin/ng-aquila/formfield';
 import {NxInputDirective, NxPasswordToggleComponent} from '@aposin/ng-aquila/input';
 import {NxButtonComponent} from '@aposin/ng-aquila/button';
 import {AuthService} from '@auth0/auth0-angular';
-import {filter, from, switchMap, take} from 'rxjs';
+import {catchError, filter, from, switchMap, take} from 'rxjs';
+import {UserRole} from '../../shared/enums/user-role.enum';
+import {MobilePrefix} from '../../shared/enums/mobile-prefix.enum';
+import {IdType} from '../../shared/enums/id-type.enum';
 
 @Component({
   selector: 'app-login-page',
@@ -73,7 +76,22 @@ export class LoginComponent implements AfterViewChecked, OnInit {
                 picture: user.picture,
               }
 
-              this.store.dispatch(new UserLoginAuth0(userLoginPayload));
+              return this.store.dispatch(new UserLoginAuth0(userLoginPayload)).pipe(
+                catchError(err => {
+                  const userRegistrationPayload: UserRegistrationForm = {
+                    email: user.email!,
+                    password: user.name!,
+                    username: user.name!,
+                    idType: IdType.Nric,
+                    idNo: 'n/a',
+                    mobileNoPrefix: MobilePrefix.Msia,
+                    mobileNo: 'n/a',
+                    role: UserRole.User
+                  };
+
+                  return this.store.dispatch(new UserRegistration(userRegistrationPayload));
+                })
+              );
             }
             return [];
           })

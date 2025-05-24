@@ -8,43 +8,52 @@
 
 <div class="form-container">
   <form [formGroup]="infoForm" (ngSubmit)="onNext()">
-    <div nxRow class="nx-margin-bottom-m">
-      <div>
-        <nx-formfield label="I am a " [negative]="(submitted && infoForm.get('gender')?.invalid) ? 'true' : 'false'">
-          <nx-dropdown formControlName="gender">
-            <nx-dropdown-item value="Male">Male</nx-dropdown-item>
-            <nx-dropdown-item value="Female">Female</nx-dropdown-item>
-          </nx-dropdown>
-          @if (submitted && infoForm.get('gender')?.hasError('required')) {
-            <nx-error>Gender is required.</nx-error>
-          }
-        </nx-formfield>
+    <div nxLayout="grid">
+      <div nxRow class="grid-row">
+        <div nxCol="12,12,12,12">
+          <nx-formfield label="I am a " [negative]="(submitted && infoForm.get('gender')?.invalid) ? 'true' : 'false'">
+            <nx-dropdown formControlName="gender">
+              <nx-dropdown-item value="Male">Male</nx-dropdown-item>
+              <nx-dropdown-item value="Female">Female</nx-dropdown-item>
+            </nx-dropdown>
+            @if (submitted && infoForm.get('gender')?.hasError('required')) {
+              <nx-error>Gender is required.</nx-error>
+            }
+          </nx-formfield>
+        </div>
       </div>
 
-      <div>
-        <nx-formfield label="My Birthdate was on">
-          <input
-            nxDatefield
-            nxInput
-            [datepicker]="myDatepicker"
-            formControlName="birthDate"
-            [max] = "maxDate"
-            [min] = "minDate"
-          />
-          <nx-datepicker-toggle
-            [for]="myDatepicker"
-            nxFormfieldSuffix
-          />
-          <nx-datepicker #myDatepicker></nx-datepicker>
-          @if(submitted && infoForm.get('birthDate')?.hasError('required')) {
-            <nx-error nxFormfieldError> This field is required </nx-error>
-          }
-        </nx-formfield>
+      <div nxRow class="grid-row">
+        <div nxCol="12,12,12,12">
+          <nx-formfield label="My Birthdate was on">
+            <input
+              nxDatefield
+              nxInput
+              [datepicker]="myDatepicker"
+              formControlName="birthDate"
+              [max] = "maxDate"
+              [min] = "minDate"
+            />
+            <nx-datepicker-toggle
+              [for]="myDatepicker"
+              nxFormfieldSuffix
+            />
+            <nx-datepicker #myDatepicker></nx-datepicker>
+            @if(submitted && infoForm.get('birthDate')?.hasError('required')) {
+              <nx-error nxFormfieldError> This field is required </nx-error>
+            }
+          </nx-formfield>
+        </div>
       </div>
 
-      <div class="buttons">
-        <button nxButton="secondary" type="button" (click)="onBack()">Back</button>
-        <button nxButton="primary" type="submit">Next</button>
+      <div nxRow>
+        <div nxCol="12,12,12,12" class="docs-grid-colored-col" style="text-align: center;">
+          <button nxButton="secondary" type="button"(click)="onBack()" style="margin-right: 1rem;">Back</button>
+          <button nxButton="primary" type="submit" [ngClass]="{ 'highlight-button': this.infoForm.get('gender')?.valid && this.infoForm.get('birthDate')?.valid }">
+            <nx-icon name="arrow-right" nxIconPositionEnd aria-hidden="true"></nx-icon>
+            Submit
+          </button>
+        </div>
       </div>
     </div>
   </form>

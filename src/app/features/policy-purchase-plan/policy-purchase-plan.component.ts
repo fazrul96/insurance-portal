@@ -8,9 +8,10 @@ import {Store} from '@ngxs/store';
 import {PolicyPurchaseState} from '../../store/policy/policy-purchase.state';
 import {SelectPlan} from '../../store/policy/policy-purchase.action';
 import {CommonModule} from '@angular/common';
-import {NxButtonComponent} from '@aposin/ng-aquila/button';
 import {PolicyDetails, PolicyPlan, PolicyPlanDto} from '../../core/models/policy.model';
 import {QuotationSummaryComponent} from '../quotation-summary/quotation-summary.component';
+import {NxButtonComponent} from '@aposin/ng-aquila/button';
+import {NxIconComponent} from '@aposin/ng-aquila/icon';
 
 @Component({
   selector: 'app-policy-purchase-plan',
@@ -22,9 +23,9 @@ import {QuotationSummaryComponent} from '../quotation-summary/quotation-summary.
     NxRadioModule,
     ReactiveFormsModule,
     CommonModule,
+    QuotationSummaryComponent,
     NxButtonComponent,
-    NxButtonComponent,
-    QuotationSummaryComponent
+    NxIconComponent
   ],
   templateUrl: './policy-purchase-plan.component.html',
   styleUrl: './policy-purchase-plan.component.scss',
@@ -102,10 +103,6 @@ export class PolicyPurchasePlanComponent implements OnInit {
         this.store.dispatch(new SelectPlan(updatedSelectedPlan));
       });
     }
-  }
-
-  onBack(): void {
-    this.prevStep();
   }
 
   onNext(): void {
