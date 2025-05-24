@@ -5,7 +5,6 @@ import {
 import {NxCardComponent, NxCardSecondaryInfoDirective,} from '@aposin/ng-aquila/card';
 import {NxHeadlineComponent} from '@aposin/ng-aquila/headline';
 import {NxProgressStepperComponent, NxStepComponent,} from '@aposin/ng-aquila/progress-stepper';
-import {PolicyPurchasePlanComponent} from '../policy-purchase-plan/policy-purchase-plan.component';
 import {PolicyPurchaseSummaryComponent} from '../policy-purchase-summary/policy-purchase-summary.component';
 import {ReactiveFormsModule,} from '@angular/forms';
 import {Store} from '@ngxs/store';
@@ -19,6 +18,9 @@ import {
 import {PolicyPurchaseReceiptComponent} from '../policy-purchase-receipt/policy-purchase-receipt.component';
 import {NgClass} from '@angular/common';
 import {PolicyPurchaseStep} from "../../core/models/policy.model";
+import {
+  PolicyPurchasePlanComparisonTableComponent
+} from '../policy-purchase-plan-comparison-table/policy-purchase-plan-comparison-table.component';
 
 @Component({
   selector: 'app-policy-purchase',
@@ -29,7 +31,6 @@ import {PolicyPurchaseStep} from "../../core/models/policy.model";
     NxHeadlineComponent,
     NxProgressStepperComponent,
     NxStepComponent,
-    PolicyPurchasePlanComponent,
     PolicyPurchaseSummaryComponent,
     ReactiveFormsModule,
     ProgressbarComponent,
@@ -39,6 +40,7 @@ import {PolicyPurchaseStep} from "../../core/models/policy.model";
     PolicyPurchaseInsuredInfoComponent,
     PolicyPurchaseReceiptComponent,
     NgClass,
+    PolicyPurchasePlanComparisonTableComponent,
   ],
   templateUrl: './policy-purchase.component.html',
   styleUrl: './policy-purchase.component.scss',

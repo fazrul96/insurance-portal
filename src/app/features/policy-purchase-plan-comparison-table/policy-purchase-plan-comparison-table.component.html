@@ -1,0 +1,108 @@
+<form [formGroup]="infoForm" (ngSubmit)="onSubmit()">
+  <div nxLayout="grid">
+    <div nxRow class="grid-row">
+    @if (plans$ | async) {
+      <div nxCol="12,12,12,9" style="margin-bottom: 1rem;">
+        <nx-comparison-table selectedIndex="1" [view]="layout">
+          <ng-container nxComparisonTableRow type="header" >
+            <nx-comparison-table-popular-cell forColumn="2" >
+              <div class="popular-cell__content-wrapper">
+                <p class="popular-cell__title">Most popular</p>
+                <button
+                  nxPlainButton
+                  class="popular-info-icon"
+                  [nxPopoverTriggerFor]="popover"
+                  nxPopoverTrigger="click"
+                  aria-label="More information"
+                  type="button"
+                >
+                  <nx-icon
+                    name="info-circle-o"
+                    aria-hidden="true"
+                  ></nx-icon>
+                </button>
+                <nx-popover #popover>
+                          <span
+                          >This product was chosen by most of the users</span
+                          >
+                </nx-popover>
+              </div>
+            </nx-comparison-table-popular-cell>
+            @for (plan of plans$ | async; track plan.planName) {
+              <nx-comparison-table-cell type="header" >
+                <div class="header-container">
+                  <p class="product-price-dynamic">
+                    RM
+                    {{infoForm.value.paymentPeriod === "monthly"
+                        ? plan.monthlyPremium
+                        : plan.yearlyPremium
+                    }}
+                  </p>
+                  <span>per {{infoForm.value.paymentPeriod }}</span>
+                  <p class="product-title">{{ plan.planName }}</p>
+                  <nx-formfield style="padding: 0.5rem; width: 100%;">
+                    <nx-dropdown formControlName="paymentPeriod" (valueChange)="onPaymentPeriodChange($event)">
+                      <nx-dropdown-item value="monthly">Monthly</nx-dropdown-item>
+                      <nx-dropdown-item value="yearly">Yearly</nx-dropdown-item>
+                    </nx-dropdown>
+                  </nx-formfield>
+                  <button
+                    nxComparisonTableSelectButton
+                    unselectedLabel="Select this plan"
+                    selectedLabel="Selected!"
+                    type="button"
+                    (click)="onPlanSelect(plan)" [class.selected]="infoForm.value.planSelection === plan.planName"
+                  ></button>
+                </div>
+              </nx-comparison-table-cell>
+            }
+          </ng-container>
+          <ng-container nxComparisonTableRow>
+            <nx-comparison-table-description-cell>
+              <div class="has-popover">
+                <span>Death / Total and Permanent Disability</span>
+                <button
+                  nxPlainButton
+                  class="info-icon"
+                  aria-label="More information"
+                  [nxPopoverTriggerFor]="popoverContent1"
+                  nxPopoverTrigger="hover"
+                  type="button"
+                >
+                  <nx-icon
+                    name="info-circle"
+                    aria-hidden="true"
+                  ></nx-icon>
+                </button>
+                <nx-popover #popoverContent1>
+                  <div style="max-width: 250px">
+                    We shall pay the amount as stated in the Table of Benefits in the event of death or total and permanent disablement during the coverage period.
+                  </div>
+                </nx-popover>
+              </div>
+            </nx-comparison-table-description-cell>
+            <nx-comparison-table-cell>RM200,000</nx-comparison-table-cell>
+            <nx-comparison-table-cell>RM300,000</nx-comparison-table-cell>
+            <nx-comparison-table-cell>RM500,000</nx-comparison-table-cell>
+          </ng-container>
+        </nx-comparison-table>
+      </div>
+    }
+      <div nxCol="12,12,12,3" style="text-align: center">
+        <app-quotation-summary
+          [quotation]="quotationDetails$ | async"
+          [paymentMode]="infoForm.value.paymentPeriod"
+        >
+          <button
+            nxButton="medium cta"
+            type="submit"
+            [disabled]="!infoForm.value.planSelection"
+            summary-actions
+          >
+            <nx-icon name="arrow-right" nxIconPositionStart aria-hidden="true"></nx-icon>Pay Now
+          </button>
+        </app-quotation-summary>
+      </div>
+    </div>
+  </div>
+</form>

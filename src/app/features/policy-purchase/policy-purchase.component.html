@@ -16,10 +16,10 @@
       }
 
       @if (item.path === 'get-quote' && item.step === 2) {
-        <app-policy-purchase-plan
+        <app-policy-purchase-plan-comparison-table
           [nextStep]="nextStep.bind(this)"
           [prevStep]="prevStep.bind(this)">
-        </app-policy-purchase-plan>
+        </app-policy-purchase-plan-comparison-table>
       }
 
       @if (item.path === 'apply-now' && item.step === 3) {

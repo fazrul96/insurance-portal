@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, inject, Input, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NxCardModule} from '@aposin/ng-aquila/card';
 import {NxDropdownComponent, NxDropdownItemComponent} from '@aposin/ng-aquila/dropdown';
@@ -36,6 +36,9 @@ export class PolicyPurchasePlanComponent implements OnInit {
   @Input() nextStep!: () => void;
   @Input() prevStep!: () => void;
 
+  private readonly formBuilder: FormBuilder = inject(FormBuilder);
+  private readonly store: Store = inject(Store);
+
   quotationDetails$!: Observable<PolicyDetails>;
   plans$: Observable<PolicyPlanDto[]> | undefined;
   selectedPlan$: Observable<PolicyPlan | undefined> | undefined;
@@ -43,10 +46,8 @@ export class PolicyPurchasePlanComponent implements OnInit {
   infoForm!: FormGroup;
   latestPlan!: PolicyPlan | undefined;
 
-  constructor(private fb: FormBuilder, private store: Store) {}
-
   ngOnInit(): void {
-    this.infoForm = this.fb.group({
+    this.infoForm = this.formBuilder.group({
       paymentPeriod: ['monthly'],
       planSelection: ['']
     });
@@ -104,7 +105,6 @@ export class PolicyPurchasePlanComponent implements OnInit {
       });
     }
   }
-
   onNext(): void {
 
     if (!this.infoForm.value.planSelection){
